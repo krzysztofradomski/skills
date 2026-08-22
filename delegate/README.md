@@ -23,23 +23,37 @@ Antigravity and Codex bill against a subscription, not per-token, so most work c
 
 ## Install
 
+From the root of your clone of [the skills repo](https://github.com/krzysztofradomski/skills):
+
 ```bash
-ln -s ~/code/skills/delegate ~/.claude/skills/delegate          # Claude Code
-ln -s ~/code/skills/delegate ~/.codex/skills/delegate           # optional: Codex CLI
-ln -s ~/code/skills/delegate/scripts/delegate.sh ~/.local/bin/  # put the script on PATH
+ln -s "$PWD/delegate" ~/.claude/skills/delegate                 # Claude Code
+ln -s "$PWD/delegate" ~/.codex/skills/delegate                  # optional: Codex CLI
+ln -s "$PWD/delegate/scripts/delegate.sh" ~/.local/bin/         # put the script on PATH
 delegate.sh providers
 ```
 
-Optional API keys, read from files so they never appear in argv or shell history:
+`providers` prints which backends it found and which models each tier is wired to. It needs no keys
+— Antigravity and Codex authenticate through their own CLIs, so if either is installed and logged
+in, you can start delegating immediately.
+
+API keys are optional and only unlock OpenRouter's free models and the paid image fallback. They are
+read from files so they never appear in argv or shell history:
 
 ```bash
-mkdir -p ~/.config/openrouter && read -rs "?OpenRouter key: " k && printf '%s' "$k" > ~/.config/openrouter/key && chmod 600 ~/.config/openrouter/key && unset k
+mkdir -p ~/.config/openrouter
+printf 'OpenRouter key: '; read -rs k; echo
+printf '%s' "$k" > ~/.config/openrouter/key; chmod 600 ~/.config/openrouter/key; unset k
 ```
 
 `$OPENROUTER_API_KEY` and `$GEMINI_API_KEY` (or `~/.config/google-ai/key`) work too.
 Verify with `delegate.sh providers --check`, which exits nonzero if a key is rejected.
 
 ## Usage
+
+In an agent session you rarely call this directly — say "delegate this to a cheaper model" or
+"review my changes" and the agent picks the right verb. Run it yourself when you want a specific
+model, or to check what is available. Each verb targets a tier: `read` and `cheap` for fast Gemini
+work, `code` and `hard` for Claude reasoning, `codex` for anything that must run tests.
 
 See [SKILL.md](SKILL.md) for routing guidance and [REFERENCE.md](REFERENCE.md) for provider quirks.
 
