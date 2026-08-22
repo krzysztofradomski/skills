@@ -56,14 +56,11 @@ h1 em{font-style:normal;color:var(--claude)}
 .tabbar label{color:var(--dim);border:1px solid var(--line);border-radius:99px;
   padding:6px 14px;cursor:pointer;background:var(--panel)}
 .tabbar label:hover{color:var(--bright);border-color:var(--router)}
-.tabbar label.soon{opacity:.72}
-#s-delegate:checked~.tabbar label[for=s-delegate],
-#s-own:checked~.tabbar label[for=s-own]{color:var(--ink);background:var(--bright);border-color:var(--bright);font-weight:600}
-#s-delegate:focus-visible~.tabbar label[for=s-delegate],
-#s-own:focus-visible~.tabbar label[for=s-own]{outline:2px solid var(--router);outline-offset:3px}
+#s-delegate:checked~.tabbar label[for=s-delegate]{color:var(--ink);background:var(--bright);
+  border-color:var(--bright);font-weight:600}
+#s-delegate:focus-visible~.tabbar label[for=s-delegate]{outline:2px solid var(--router);outline-offset:3px}
 .pane{display:none}
 #s-delegate:checked~.pane-delegate{display:block}
-#s-own:checked~.pane-own{display:block}
 
 .caption{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin:0 0 14px;max-width:74ch}
 .caption b{color:var(--text);font-weight:500}
@@ -186,12 +183,10 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
 
 <div class="switch" id="session">
   <input type="radio" name="skill" id="s-delegate" checked>
-  <input type="radio" name="skill" id="s-own">
 
   <div class="tabbar">
     <span class="eyebrow">skill</span>
     <label for="s-delegate">delegate</label>
-    <label for="s-own" class="soon">writing your own</label>
   </div>
 
   <div class="pane pane-delegate">
@@ -269,32 +264,6 @@ wrote cart-icon.png (codex imagegen, free)<span class="caret"></span></p>
     </div>
   </div>
 
-  <div class="pane pane-own">
-    <p class="caption">There is one skill here so far. This tab is where the next ones will appear —
-    and what you need if you would rather build your own.</p>
-    <div class="how">
-      <h3>A skill is a folder</h3>
-      <p>Drop it in and the installer picks it up. Any directory holding a <code>SKILL.md</code> counts;
-      there is no manifest to register it in.</p>
-      <pre>skill-name/
-├── SKILL.md      # required: frontmatter (name, description) + instructions
-├── REFERENCE.md  # optional: detail the agent loads only when it needs it
-├── README.md     # optional: for humans — install, requirements, limits
-└── scripts/      # optional: work better done in code than re-derived</pre>
-    </div>
-    <div class="how">
-      <h3>The description is the whole interface</h3>
-      <p>It is the only part your agent reads when deciding whether a skill applies, so it has to say
-      what the skill does <em>and</em> when to reach for it. Keep <code>SKILL.md</code> short and push
-      detail into <code>REFERENCE.md</code> — everything in the main file costs context on every load.</p>
-    </div>
-    <div class="how">
-      <h3>Two things worth stealing from delegate</h3>
-      <p>Put a guard in code rather than documenting a rule and hoping the model follows it. And never
-      let a skill spend money without an explicit flag.</p>
-      <p class="aside"><a href="https://github.com/krzysztofradomski/skills/tree/main/delegate">Read the delegate source ↗</a></p>
-    </div>
-  </div>
 </div>
 
 <section id="install">
