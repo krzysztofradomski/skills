@@ -72,13 +72,14 @@ h1 em{font-style:normal;color:var(--claude)}
   padding:11px 16px;border-bottom:1px solid var(--line);background:var(--panel-2);
   font-family:var(--mono);font-size:12px;color:var(--dim)}
 .term-bar b{color:var(--text);font-weight:500}
-.term-body{padding:0 0 6px;font-family:var(--mono);font-size:13.5px;line-height:1.72}
+.term-body{padding:0 0 6px;font-family:var(--mono);font-size:13.5px;line-height:1.72;
+  overflow-x:auto}
 .step{padding:15px 16px 6px;border-top:1px solid #202744}
 .step:first-child{border-top:0}
-.cmd{color:var(--bright);margin:0;display:flex;gap:9px;align-items:flex-start;overflow-wrap:anywhere}
+.cmd{color:var(--bright);margin:0;display:flex;gap:9px;align-items:flex-start}
 .cmd::before{content:"\276F";color:var(--router);flex:none;font-weight:600}
 .note{color:var(--dim);margin:3px 0 10px 18px;font-size:12.5px;line-height:1.6}
-.res{color:var(--text);margin:0 0 4px 18px;white-space:pre-wrap;overflow-wrap:anywhere}
+.res{color:var(--text);margin:0 0 4px 18px}
 .add{color:var(--codex)}
 .warn{color:var(--paid)}
 .flag{color:var(--claude)}
@@ -91,29 +92,17 @@ h1 em{font-style:normal;color:var(--claude)}
   vertical-align:-3px;margin-left:2px;animation:blink 1.06s steps(2,start) infinite}
 @keyframes blink{50%{opacity:0}}
 
-/* Plays out line by line. The default state is fully visible — the animation only *delays*
-   arrival, so if it never runs the transcript is still all there. */
-@keyframes arrive{from{opacity:0;transform:translateY(-2px)}to{opacity:1;transform:none}}
-.step>*{animation:arrive .3s ease backwards}
-.step:nth-child(1)>.cmd{animation-delay:.15s}
-.step:nth-child(1)>.note{animation-delay:.35s}
-.step:nth-child(1)>.res{animation-delay:.5s}
-.step:nth-child(2)>.cmd{animation-delay:.8s}
-.step:nth-child(2)>.note{animation-delay:1s}
-.step:nth-child(2)>.res{animation-delay:1.15s}
-.step:nth-child(3)>.cmd{animation-delay:1.45s}
-.step:nth-child(3)>.note{animation-delay:1.65s}
-.step:nth-child(3)>.res{animation-delay:1.8s}
-.step:nth-child(4)>.cmd{animation-delay:2.1s}
-.step:nth-child(4)>.note{animation-delay:2.3s}
-.step:nth-child(4)>.res{animation-delay:2.45s}
-.step:nth-child(5)>.cmd{animation-delay:2.75s}
-.step:nth-child(5)>.note{animation-delay:2.95s}
-.step:nth-child(5)>.res{animation-delay:3.1s}
-.step:nth-child(6)>.cmd{animation-delay:3.4s}
-.step:nth-child(6)>.note{animation-delay:3.6s}
-.step:nth-child(6)>.res{animation-delay:3.75s}
-.term-foot{animation:arrive .3s 4.05s ease backwards}
+/* The command types character by character, then its output streams a line at a time — which is how
+   a terminal behaves; output does not type itself. Every animation ends on the element's normal
+   style, so if none of it runs the transcript is simply all there. */
+@keyframes typing{from{width:0}to{width:var(--w)}}
+@keyframes appear{from{opacity:0}to{opacity:1}}
+.cmd .type{display:inline-block;white-space:pre;overflow:hidden;vertical-align:bottom;
+  flex:0 0 auto;                       /* a flex item would shrink and clip the command for good */
+  width:var(--w);animation:typing var(--dur) steps(var(--n),end) var(--d) backwards}
+.note{animation:appear .18s var(--d) ease backwards}
+.res .l{display:block;white-space:pre;animation:appear .01s var(--d) linear backwards}
+.term-foot{animation:appear .3s var(--d) ease backwards}
 
 section{padding:64px 0 0}
 h2{font-family:var(--display);font-weight:500;color:var(--bright);font-size:15px;
@@ -157,7 +146,8 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .step>*,.term-foot{animation:none}
+  .step>*,.cmd .type,.res .l,.term-foot{animation:none}
+  .cmd .type{width:auto}
   .caret{animation:none;opacity:.5}
 }
 </style>
@@ -202,62 +192,74 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
       <div class="term-body">
 
         <div class="step">
-          <p class="cmd">delegate.sh providers</p>
-          <p class="note">Who is available, and which model each tier is wired to.</p>
-          <p class="res">antigravity  available (plan) hard=claude-opus-4-6-thinking code=claude-sonnet-4-6
-             read=gemini-3.7-flash-high cheap=gemini-3.7-flash-low
-codex        available (plan: chatgpt)
-openrouter   key present (not verified; use: providers --check)
-ai-studio    key present (images blocked on free tier)</p>
+          <p class="cmd"><span class="type" style="--w:21ch;--dur:588ms;--d:250ms;--n:21">delegate.sh providers</span></p>
+          <p class="note" style="--d:948ms">Who is available, and which model each tier is wired to.</p>
+          <p class="res">
+<span class="l" style="--d:1028ms">antigravity  available (plan) hard=claude-opus-4-6-thinking code=claude-sonnet-4-6</span>
+<span class="l" style="--d:1060ms">             read=gemini-3.7-flash-high cheap=gemini-3.7-flash-low</span>
+<span class="l" style="--d:1092ms">codex        available (plan: chatgpt)</span>
+<span class="l" style="--d:1124ms">openrouter   key present (not verified; use: providers --check)</span>
+<span class="l" style="--d:1156ms">ai-studio    key present (images blocked on free tier)</span>
+</p>
         </div>
 
         <div class="step">
-          <p class="cmd">delegate.sh read "List every exported function in src/cart.js"</p>
-          <p class="note">Reading is cheap work, so it goes to Gemini Flash. <span class="who">free · plan</span></p>
-          <p class="res">- subtotal (src/cart.js:1-3): Calculates the total sum of items in the cart by
-  multiplying each item's price by its quantity.
-- applyDiscount (src/cart.js:5-7): Computes the discounted total by applying
-  a given percentage reduction to an amount.</p>
+          <p class="cmd"><span class="type" style="--w:62ch;--dur:900ms;--d:1358ms;--n:62">delegate.sh read "List every exported function in src/cart.js"</span></p>
+          <p class="note" style="--d:2368ms">Reading is cheap work, so it goes to Gemini Flash. <span class="who">free · plan</span></p>
+          <p class="res">
+<span class="l" style="--d:2448ms">- subtotal (src/cart.js:1-3): Calculates the total sum of items in the cart by</span>
+<span class="l" style="--d:2480ms">  multiplying each item's price by its quantity.</span>
+<span class="l" style="--d:2512ms">- applyDiscount (src/cart.js:5-7): Computes the discounted total by applying</span>
+<span class="l" style="--d:2544ms">  a given percentage reduction to an amount.</span>
+</p>
         </div>
 
         <div class="step">
-          <p class="cmd">delegate.sh code "applyDiscount does not validate percent. Add a guard that throws a RangeError when it is below 0 or above 100." --write</p>
-          <p class="note">A bounded change you could hand a competent stranger, so Claude Sonnet writes it. <span class="who">free · plan</span></p>
-          <p class="res">Done. applyDiscount now throws a RangeError before any calculation when percent
-is outside [0, 100]. Everything else in the file is unchanged.</p>
+          <p class="cmd"><span class="type" style="--w:137ch;--dur:900ms;--d:2746ms;--n:137">delegate.sh code "applyDiscount does not validate percent. Add a guard that throws a RangeError when it is below 0 or above 100." --write</span></p>
+          <p class="note" style="--d:3756ms">A bounded change you could hand a competent stranger, so Claude Sonnet writes it. <span class="who">free · plan</span></p>
+          <p class="res">
+<span class="l" style="--d:3836ms">Done. applyDiscount now throws a RangeError before any calculation when percent</span>
+<span class="l" style="--d:3868ms">is outside [0, 100]. Everything else in the file is unchanged.</span>
+</p>
         </div>
 
         <div class="step">
-          <p class="cmd">git diff</p>
-          <p class="note">Read the diff yourself — a delegate reporting success is a claim, not evidence. delegate also checks the files really changed.</p>
-          <p class="res"> src/cart.js | 3 +++
-
- function applyDiscount(total, percent) {
-<span class="add">+  if (percent &lt; 0 || percent &gt; 100) {
-+    throw new RangeError('percent must be between 0 and 100');
-+  }</span>
-   return total - (total * percent / 100);</p>
+          <p class="cmd"><span class="type" style="--w:8ch;--dur:224ms;--d:4070ms;--n:8">git diff</span></p>
+          <p class="note" style="--d:4404ms">Read the diff yourself — a delegate reporting success is a claim, not evidence. delegate also checks the files really changed.</p>
+          <p class="res">
+<span class="l" style="--d:4484ms"> src/cart.js | 3 +++</span>
+<span class="l" style="--d:4516ms">&nbsp;</span>
+<span class="l" style="--d:4548ms"> function applyDiscount(total, percent) {</span>
+<span class="l" style="--d:4580ms"><span class="add">+  if (percent &lt; 0 || percent &gt; 100) {</span>
+<span class="l" style="--d:4612ms">+    throw new RangeError('percent must be between 0 and 100');</span>
+<span class="l" style="--d:4644ms">+  }</span></span>
+<span class="l" style="--d:4676ms">   return total - (total * percent / 100);</span>
+</p>
         </div>
 
         <div class="step">
-          <p class="cmd">delegate.sh review --uncommitted</p>
-          <p class="note">Claude wrote it, so Codex reviews it. A model reviewing its own work mostly agrees with itself. <span class="who">free · plan</span></p>
-          <p class="res"><span class="flag">- [P2] Reject nonnumeric discount percentages — src/cart.js:6</span>
-  When percent is NaN, undefined, or a nonnumeric string, both comparisons
-  evaluate to false, so the new guard is bypassed and the function returns
-  NaN instead of rejecting an invalid percentage. Validate that percent is
-  a finite number before applying the range check.</p>
+          <p class="cmd"><span class="type" style="--w:32ch;--dur:896ms;--d:4878ms;--n:32">delegate.sh review --uncommitted</span></p>
+          <p class="note" style="--d:5884ms">Claude wrote it, so Codex reviews it. A model reviewing its own work mostly agrees with itself. <span class="who">free · plan</span></p>
+          <p class="res">
+<span class="l" style="--d:5964ms"><span class="flag">- [P2] Reject nonnumeric discount percentages — src/cart.js:6</span></span>
+<span class="l" style="--d:5996ms">  When percent is NaN, undefined, or a nonnumeric string, both comparisons</span>
+<span class="l" style="--d:6028ms">  evaluate to false, so the new guard is bypassed and the function returns</span>
+<span class="l" style="--d:6060ms">  NaN instead of rejecting an invalid percentage. Validate that percent is</span>
+<span class="l" style="--d:6092ms">  a finite number before applying the range check.</span>
+</p>
         </div>
 
         <div class="step">
-          <p class="cmd">delegate.sh image "a flat-design shopping cart icon" cart-icon.png</p>
-          <p class="note">Image generation has its own small quota, separate from the model quota — and it was spent. Two free paths run before anything paid, so the second picked it up.</p>
-          <p class="res"><span class="warn">[delegate] antigravity produced no image, trying codex imagegen</span>
-wrote cart-icon.png (codex imagegen, free)<span class="caret"></span></p>
+          <p class="cmd"><span class="type" style="--w:66ch;--dur:900ms;--d:6294ms;--n:66">delegate.sh image "a flat-design shopping cart icon" cart-icon.png</span></p>
+          <p class="note" style="--d:7304ms">Image generation has its own small quota, separate from the model quota — and it was spent. Two free paths run before anything paid, so the second picked it up.</p>
+          <p class="res">
+<span class="l" style="--d:7384ms"><span class="warn">[delegate] antigravity produced no image, trying codex imagegen</span></span>
+<span class="l" style="--d:7416ms">wrote cart-icon.png (codex imagegen, free)<span class="caret"></span></span>
+</p>
         </div>
 
       </div>
-      <div class="term-foot">
+      <div class="term-foot" style="--d:7618ms">
         Spend for that session: <b>nothing</b>. Every step ran on a subscription that was already being
         paid for — and the review caught a real hole in the guard that had just been written.
       </div>
