@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>skills — agent skills by Krzysztof Radomski</title>
+<meta name="description" content="Personal agent skills for Claude Code and Codex CLI. Route work to the cheapest model that can do it.">
+<meta property="og:title" content="skills — agent skills for Claude Code and Codex">
+<meta property="og:description" content="Route work to the cheapest thing that can do it. Free on plan allowance, paid only when you ask.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@500;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E1220; --panel:#161B2E; --panel-2:#1D2338; --line:#2A3150;
+  --text:#C9CFE2; --bright:#EDF1FA; --dim:#727C9E;
+  --claude:#D9805A; --codex:#3EBD93; --antigravity:#5B8DEF; --router:#9A86F0; --paid:#E0A458;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --display:'Martian Mono',var(--mono);
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--ink);color:var(--text);
+  font-family:var(--sans);font-size:16px;line-height:1.6;
+  background-image:linear-gradient(180deg,#131829 0%,var(--ink) 340px);
+}
+.wrap{max-width:980px;margin:0 auto;padding:0 22px}
+a{color:var(--bright);text-decoration-color:var(--line);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--claude)}
+:focus-visible{outline:2px solid var(--router);outline-offset:2px;border-radius:2px}
+
+/* top rail — reads like a status line, because that is what the tool prints */
+.rail{border-bottom:1px solid var(--line);background:rgba(14,18,32,.8);backdrop-filter:blur(6px);position:sticky;top:0;z-index:5}
+.rail .wrap{display:flex;gap:14px;align-items:center;justify-content:space-between;
+  font-family:var(--mono);font-size:12.5px;padding-top:11px;padding-bottom:11px;color:var(--dim)}
+.rail b{color:var(--bright);font-weight:600}
+.rail .ok{color:var(--codex)}
+
+header{padding:74px 0 8px}
+h1{
+  font-family:var(--display);font-weight:700;color:var(--bright);
+  font-size:clamp(27px,5.4vw,50px);line-height:1.12;letter-spacing:-.02em;margin:0 0 20px;
+  max-width:15ch;
+}
+h1 em{font-style:normal;color:var(--claude)}
+.lede{font-size:17px;max-width:60ch;margin:0 0 30px;color:var(--text)}
+.lede strong{color:var(--bright);font-weight:500}
+
+/* ── signature: the router ── */
+.router{border:1px solid var(--line);border-radius:9px;background:var(--panel);overflow:hidden;
+  box-shadow:0 18px 50px -28px #000}
+.router-bar{display:flex;gap:9px;align-items:center;justify-content:space-between;
+  padding:10px 15px;border-bottom:1px solid var(--line);
+  background:var(--panel-2);font-family:var(--mono);font-size:12px;color:var(--dim)}
+.bar-right{color:var(--line)}
+.router-body{padding:17px 15px 15px;font-family:var(--mono);font-size:14px}
+.promptline{display:flex;align-items:baseline;gap:9px}
+.chev{color:var(--router);flex:none;font-weight:600}
+#task{
+  flex:1;min-width:0;background:none;border:0;color:var(--bright);
+  font:inherit;padding:5px 0;caret-color:var(--claude)
+}
+#task::placeholder{color:var(--dim)}
+.out{margin-top:13px;min-height:132px}
+.row{display:flex;gap:11px;padding:3px 0;opacity:0;transform:translateY(-3px);
+  animation:in .26s ease forwards}
+.row:nth-child(2){animation-delay:.07s}
+.row:nth-child(3){animation-delay:.14s}
+.row:nth-child(4){animation-delay:.21s}
+.row:nth-child(5){animation-delay:.28s}
+@keyframes in{to{opacity:1;transform:none}}
+.tree{color:var(--line);flex:none}
+.k{color:var(--dim);flex:none;width:74px}
+.v{color:var(--text);min-width:0;overflow-wrap:anywhere}
+.v b{color:var(--bright);font-weight:600}
+.cmd{margin-top:12px;padding:11px 13px;border-radius:6px;background:#0B0F1B;border:1px solid var(--line);
+  color:var(--bright);display:flex;gap:10px;align-items:flex-start}
+.cmd span{color:var(--dim);flex:none}
+.cmd code{font-family:var(--mono);font-size:13.5px;overflow-wrap:anywhere}
+.tag{font-family:var(--mono);font-size:11.5px;padding:2px 8px;border-radius:99px;border:1px solid;white-space:nowrap}
+.t-free{color:var(--codex);border-color:#265c4b;background:#10241d}
+.t-paid{color:var(--paid);border-color:#5c4726;background:#241d10}
+.hint{margin-top:14px;display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.hint span{font-family:var(--mono);font-size:12px;color:var(--dim);margin-right:2px}
+.chip{font-family:var(--mono);font-size:12.5px;color:var(--text);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:99px;padding:5px 11px;cursor:pointer}
+.chip:hover{border-color:var(--router);color:var(--bright)}
+
+/* sections */
+section{padding:62px 0 0}
+h2{font-family:var(--display);font-weight:500;color:var(--bright);font-size:15px;letter-spacing:.04em;
+  margin:0 0 6px;text-transform:lowercase}
+.sub{color:var(--dim);font-size:14.5px;margin:0 0 22px;max-width:62ch}
+
+.tabs{display:flex;gap:5px;margin-bottom:0;flex-wrap:wrap}
+.tab{font-family:var(--mono);font-size:13px;color:var(--dim);background:none;border:1px solid transparent;
+  border-bottom:none;border-radius:7px 7px 0 0;padding:9px 14px;cursor:pointer}
+.tab[aria-selected=true]{color:var(--bright);background:var(--panel);border-color:var(--line)}
+.panel{border:1px solid var(--line);border-radius:0 9px 9px 9px;background:var(--panel);padding:17px}
+.panel p{margin:0 0 13px;font-size:14.5px;color:var(--text)}
+.panel p:last-of-type{margin-bottom:0}
+pre{margin:0;padding:13px;background:#0B0F1B;border:1px solid var(--line);border-radius:6px;
+  font-family:var(--mono);font-size:13px;color:var(--bright);line-height:1.75;
+  white-space:pre-wrap;overflow-wrap:anywhere}
+.copy{margin-top:11px;font-family:var(--mono);font-size:12.5px;color:var(--dim);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:6px;padding:7px 12px;cursor:pointer}
+.copy:hover{color:var(--bright);border-color:var(--router)}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;color:var(--dim);font-weight:500;letter-spacing:.05em;text-transform:uppercase}
+td:first-child{font-family:var(--mono);color:var(--bright);white-space:nowrap}
+.pv{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:8px;vertical-align:1px}
+
+ul.plain{list-style:none;padding:0;margin:0}
+ul.plain li{padding:11px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+ul.plain li:last-child{border-bottom:0}
+ul.plain b{color:var(--bright);font-weight:500;font-family:var(--mono);font-size:13.5px}
+
+footer{margin-top:70px;padding:26px 0 46px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:12.5px;color:var(--dim);
+  display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap}
+
+@media (max-width:620px){
+  header{padding-top:46px}
+  .k{width:62px}
+  .router-body{font-size:13px}
+  .rail .wrap{font-size:11.5px}
+  .rail .hide-sm{display:none}
+  .bar-right{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .row{animation:none;opacity:1;transform:none}
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="rail"><div class="wrap">
+  <span><b>skills</b> / krzysztofradomski</span>
+  <span class="hide-sm"><span class="ok">●</span> claude code &nbsp;·&nbsp; <span class="ok">●</span> codex cli</span>
+</div></div>
+
+<div class="wrap">
+
+<header>
+  <h1>Route work to the <em>cheapest thing</em> that can do it.</h1>
+  <p class="lede">Agent skills for Claude Code and Codex CLI. <strong>delegate</strong> sizes up a task,
+  picks a model that matches its difficulty, and sends it to a provider you are already paying for —
+  so most of it costs nothing extra. Type a task below and watch it decide.</p>
+</header>
+
+<div class="router">
+  <div class="router-bar">
+    <span>delegate — routing preview</span>
+    <span class="bar-right">6 tiers · 4 providers</span>
+  </div>
+  <div class="router-body">
+    <div class="promptline">
+      <span class="chev">❯</span>
+      <input id="task" autocomplete="off" spellcheck="false"
+             aria-label="Describe a task to see how delegate routes it"
+             placeholder="describe a task…  (or type: help)">
+    </div>
+    <div class="out" id="out" aria-live="polite"></div>
+    <div class="hint">
+      <span>try</span>
+      <button class="chip">review my diff</button>
+      <button class="chip">find where auth is handled</button>
+      <button class="chip">rename this variable everywhere</button>
+      <button class="chip">make an icon of a llama</button>
+      <button class="chip">refactor the payment flow</button>
+    </div>
+  </div>
+</div>
+
+<section id="install">
+  <h2>install</h2>
+  <p class="sub">Three ways in. All of them link the skill into Claude Code, and into Codex too when it is installed.</p>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" aria-controls="p0">ask your agent</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p1">one command</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p2">by hand</button>
+  </div>
+
+  <div class="panel" id="p0" role="tabpanel">
+    <p>Paste this into Claude Code or Codex. It reads the repo and does the rest.</p>
+    <pre id="c0">Install the skills from https://github.com/krzysztofradomski/skills —
+clone it, then symlink the skills into my agent skill directory and any
+bundled scripts onto my PATH. Show me what you linked.</pre>
+    <button class="copy" data-for="c0">copy</button>
+  </div>
+
+  <div class="panel" id="p1" role="tabpanel" hidden>
+    <p>Clones to <code>~/.local/share/agent-skills</code>, links the skills, puts scripts on your <code>PATH</code>.
+    Re-run it to update. It skips anything that is already a real directory rather than overwriting it.</p>
+    <pre id="c1">curl -fsSL https://raw.githubusercontent.com/krzysztofradomski/skills/main/install.sh | bash</pre>
+    <button class="copy" data-for="c1">copy</button>
+    <p style="margin-top:14px;color:var(--dim);font-size:13.5px">Piping a stranger's script into your shell is
+    a habit worth resisting — download it and read it first if you would rather. It is about sixty lines.</p>
+  </div>
+
+  <div class="panel" id="p2" role="tabpanel" hidden>
+    <p>Symlinks, not copies, so <code>git pull</code> updates everything with nothing to reinstall.</p>
+    <pre id="c2">git clone https://github.com/krzysztofradomski/skills.git ~/code/skills
+cd ~/code/skills
+ln -s "$PWD/delegate" ~/.claude/skills/delegate
+ln -s "$PWD/delegate" ~/.codex/skills/delegate
+ln -s "$PWD/delegate/scripts/delegate.sh" ~/.local/bin/</pre>
+    <button class="copy" data-for="c2">copy</button>
+  </div>
+  <p class="sub" style="margin-top:16px">Then start a <em>new</em> agent session — skills load at startup.</p>
+</section>
+
+<section id="providers">
+  <h2>where the work goes</h2>
+  <p class="sub">Antigravity and Codex bill against a subscription rather than per token, so the default path
+  costs nothing on top of what you already pay. Anything that spends money is opt-in behind a flag.</p>
+  <table>
+    <thead><tr><th>provider</th><th>auth</th><th>used for</th></tr></thead>
+    <tbody>
+      <tr><td><i class="pv" style="background:var(--antigravity)"></i>antigravity</td><td><span class="tag t-free">plan</span></td><td>the default — reading, coding, and image generation</td></tr>
+      <tr><td><i class="pv" style="background:var(--codex)"></i>codex</td><td><span class="tag t-free">plan</span></td><td>review, and anything that has to actually run your tests</td></tr>
+      <tr><td><i class="pv" style="background:var(--router)"></i>openrouter</td><td><span class="tag t-free">free tier</span></td><td>one-shot text when no repo context is needed</td></tr>
+      <tr><td><i class="pv" style="background:var(--paid)"></i>paid fallback</td><td><span class="tag t-paid">--paid</span></td><td>images only, only when both free paths fail, only if you ask</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="why">
+  <h2>what it actually does for you</h2>
+  <ul class="plain">
+    <li><b>picks a model that fits the job</b> — a rename does not need the model you would hand a security review, and a security review should not go to the fast one.</li>
+    <li><b>reviews across vendors</b> — inside Claude Code, Codex reviews your diff; inside Codex, Claude does. Reviewing code with the model that wrote it mostly confirms it.</li>
+    <li><b>checks that work actually happened</b> — after a write it verifies the files changed, because some models report success having touched nothing.</li>
+    <li><b>never spends money quietly</b> — two free image paths run first, and the paid one needs an explicit flag.</li>
+  </ul>
+</section>
+
+<footer>
+  <span>MIT · built for my own use, shared in case it is useful</span>
+  <span><a href="https://github.com/krzysztofradomski/skills">github.com/krzysztofradomski/skills</a></span>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var FREE='t-free', PAID='t-paid';
+  // Routing rules mirror the skill's own tiers. Order matters: first match wins.
+  var RULES=[
+    {re:/\b(review|audit|critique|diff|pr\b|pull request|check my)\b/i,
+     tier:'review', model:'the vendor you are not in', prov:'codex ⇄ claude', cost:FREE, tagtext:'plan',
+     cmd:'delegate.sh review --uncommitted',
+     why:'a second vendor argues against the change'},
+    {re:/\b(image|icon|logo|picture|photo|illustration|render|draw|sprite)\b/i,
+     tier:'image', model:'generate_image', prov:'antigravity', cost:FREE, tagtext:'free',
+     cmd:'delegate.sh image "<prompt>" out.png',
+     why:'two free paths run before anything paid'},
+    {re:/\b(security|auth|crypto|concurren|race condition|migrat|architect|refactor|redesign|payment|money|permission)\b/i,
+     tier:'hard', model:'claude opus', prov:'antigravity', cost:FREE, tagtext:'plan',
+     cmd:'delegate.sh hard "<task>"',
+     why:'subtle, cross-cutting, or expensive to get wrong'},
+    {re:/\b(find|where|which files|search|read|summar|explain|trace|list|understand|locate)\b/i,
+     tier:'read', model:'gemini flash', prov:'antigravity', cost:FREE, tagtext:'plan',
+     cmd:'delegate.sh read "<question>"',
+     why:'big context, fast, and it only has to read'},
+    {re:/\b(rename|format|lint|typo|regex|reorder|sort|comment|whitespace|prettier)\b/i,
+     tier:'cheap', model:'gemini flash low', prov:'antigravity', cost:FREE, tagtext:'plan',
+     cmd:'delegate.sh cheap "<task>"',
+     why:'mechanical, and wrong would be obvious at a glance'},
+    {re:/\b(run|test|build|npm|pytest|ci\b|install|compile|benchmark)\b/i,
+     tier:'codex', model:'gpt', prov:'codex', cost:FREE, tagtext:'plan',
+     cmd:'delegate.sh codex "<task>" --write',
+     why:'the only delegate that can run your test suite'}
+  ];
+  var FALLBACK={tier:'code', model:'claude sonnet', prov:'antigravity', cost:FREE, tagtext:'plan',
+    cmd:'delegate.sh code "<task>" --write', why:'a bounded change you can describe precisely'};
+
+  var out=document.getElementById('out'), task=document.getElementById('task');
+  function esc(s){return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+  function row(k,v){return '<div class="row"><span class="tree">├</span><span class="k">'+k+'</span><span class="v">'+v+'</span></div>'}
+
+  function help(){
+    out.innerHTML=
+      row('what','type any task in plain words — it shows which tier and provider would take it')+
+      row('tiers','<b>read</b> · <b>cheap</b> · <b>code</b> · <b>hard</b> · <b>review</b> · <b>image</b>')+
+      row('cost','<b>plan</b> means it comes out of a subscription you already pay for')+
+      '<div class="row"><span class="tree">└</span><span class="k">note</span><span class="v">this page is a preview of the routing rules, not a live agent</span></div>';
+  }
+  function route(text){
+    var t=text.trim();
+    if(!t){out.innerHTML='';return}
+    if(/^(help|\?|h)$/i.test(t)){help();return}
+    if(/^(clear|cls)$/i.test(t)){out.innerHTML='';task.value='';return}
+    var m=FALLBACK;
+    for(var i=0;i<RULES.length;i++){ if(RULES[i].re.test(t)){m=RULES[i];break} }
+    out.innerHTML=
+      row('task','<b>'+esc(t)+'</b>')+
+      row('tier','<b>'+m.tier+'</b> &nbsp;<span style="color:var(--dim)">'+m.why+'</span>')+
+      row('model',m.model)+
+      '<div class="row"><span class="tree">└</span><span class="k">provider</span><span class="v"><b>'+
+        m.prov+'</b> &nbsp;<span class="tag '+m.cost+'">'+m.tagtext+'</span></span></div>'+
+      '<div class="cmd"><span>❯</span><code>'+esc(m.cmd)+'</code></div>';
+  }
+
+  task.addEventListener('input',function(){route(task.value)});
+  task.addEventListener('keydown',function(e){ if(e.key==='Enter') route(task.value) });
+  Array.prototype.forEach.call(document.querySelectorAll('.chip'),function(b){
+    b.addEventListener('click',function(){ task.value=b.textContent; route(b.textContent); task.focus() });
+  });
+  route('review my diff');
+
+  // tabs
+  var tabs=Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  tabs.forEach(function(tb,i){
+    tb.addEventListener('click',function(){
+      tabs.forEach(function(o,j){
+        o.setAttribute('aria-selected', j===i?'true':'false');
+        document.getElementById(o.getAttribute('aria-controls')).hidden = j!==i;
+      });
+    });
+  });
+
+  // copy
+  Array.prototype.forEach.call(document.querySelectorAll('.copy'),function(b){
+    b.addEventListener('click',function(){
+      var txt=document.getElementById(b.dataset.for).textContent;
+      navigator.clipboard.writeText(txt).then(function(){
+        var o=b.textContent; b.textContent='copied'; setTimeout(function(){b.textContent=o},1400);
+      },function(){ b.textContent='press ⌘C'; });
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -106,6 +106,12 @@ You do not need to invoke a skill by name. Describe what you want, and the agent
 whose description matches — "delegate this to a cheaper model" pulls in `delegate` on its own. Name
 it explicitly (`/delegate`) when you want to be certain, or when the phrasing is ambiguous.
 
+## Site
+
+[`site/`](site/) is a single self-contained `index.html` — an interactive routing preview where you
+type a task and see which tier and provider would take it. No build step and no dependencies beyond
+Google Fonts; drop the folder into Cloudflare Pages (or any static host) as-is.
+
 ## Writing a skill
 
 ```
