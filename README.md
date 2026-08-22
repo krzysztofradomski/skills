@@ -108,9 +108,11 @@ it explicitly (`/delegate`) when you want to be certain, or when the phrasing is
 
 ## Site
 
-[`site/`](site/) is a single self-contained `index.html` — an interactive routing preview where you
-type a task and see which tier and provider would take it. No build step and no dependencies beyond
-Google Fonts; drop the folder into Cloudflare Pages (or any static host) as-is.
+[`site/`](site/) is a single self-contained `index.html`: a landing page built around a real
+`delegate` session, captured as it ran — reading a file, writing a fix, catching a bug in that fix
+through cross-vendor review, and generating an image, all on plan allowance. No JavaScript, no build
+step, no dependencies beyond Google Fonts. Drop the folder into Cloudflare Pages (or any static host)
+as-is.
 
 ## Writing a skill
 
