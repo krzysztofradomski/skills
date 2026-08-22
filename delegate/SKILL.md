@@ -16,7 +16,7 @@ delegate.sh read  "<prompt>" [dir]             # read/search/summarize   (Gemini
 delegate.sh code  "<prompt>" [dir] [--write]   # ordinary implementation (Claude Sonnet)
 delegate.sh hard  "<prompt>" [dir] [--write]   # subtle / cross-cutting  (Claude Opus)
 delegate.sh cheap "<prompt>" [dir]             # trivial one-liners      (Gemini Flash low)
-delegate.sh review [dir] [--uncommitted|--base <branch>]   # adversarial review (Codex)
+delegate.sh review [dir] [--uncommitted|--base <branch>] [--by claude|codex]  # cross-vendor review
 delegate.sh codex "<prompt>" [dir] [--write]   # the only delegate that can run shell/tests
 delegate.sh or    "<prompt>" [model]           # free frontier model, best-first
 delegate.sh image "<prompt>" out.png [--paid]  # free; --paid to allow spending
@@ -52,9 +52,11 @@ read-only, then execute with `codex --write`, the only delegate that can run a b
 2. **OpenRouter free** — when Antigravity is down, or one-shot text needing no repo context.
 3. **Codex** — adversarial review, and anything that must actually run commands.
 
-`delegate.sh review` runs `codex review`: a different vendor's model, with shell access, arguing
-against work you just accepted. Use it after any non-trivial change, including your own — reviewing
-work with the model that wrote it mostly confirms it.
+`delegate.sh review` puts a **different vendor's** model against work you just accepted, because
+reviewing code with the model that wrote it mostly confirms it. The reviewer is chosen from whichever
+CLI you are running inside: in Claude Code it runs `codex review` (which also gets shell access to
+run tests); inside Codex it reviews with Claude Opus via Antigravity. Override with
+`--by claude|codex`. Use it after any non-trivial change, including your own.
 
 ## Delegating well
 

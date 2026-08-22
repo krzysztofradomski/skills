@@ -60,7 +60,7 @@ See [SKILL.md](SKILL.md) for routing guidance and [REFERENCE.md](REFERENCE.md) f
 ```bash
 delegate.sh read  "Which files define the auth middleware?" ~/code/app
 delegate.sh code  "Add a null guard to parse() in src/x.ts" ~/code/app --write
-delegate.sh review ~/code/app --base main
+delegate.sh review ~/code/app --base main          # reviewed by the vendor you are NOT running in
 delegate.sh image "a flat blue key icon on white" icon.png
 ```
 

@@ -21,6 +21,14 @@ M_WRITE="${M_WRITE:-gemini-3.1-pro-high}"
 
 die() { echo "delegate: $*" >&2; exit 2; }
 
+# Review must come from a different vendor than the agent that wrote the code, so the reviewer is
+# chosen against whichever CLI we are running inside.
+host_agent() {
+  if [ -n "${CODEX_SESSION_ID:-}${CODEX_THREAD_ID:-}" ]; then echo codex
+  elif [ -n "${CLAUDE_CODE_ENTRYPOINT:-}${CLAUDECODE:-}" ]; then echo claude
+  else echo unknown; fi
+}
+
 # BSD/macOS and GNU/Linux disagree on these three; pick whichever the host actually has.
 mtime_name() { stat -f '%m %N' "$@" 2>/dev/null || stat -c '%Y %n' "$@" 2>/dev/null; }
 b64d() { base64 -d 2>/dev/null || base64 -D; }
@@ -215,12 +223,12 @@ codex) # delegate.sh codex "<prompt>" [dir] [--write]  -- the one that can run s
     [ -n "$ch" ] || { echo "delegate: codex --write changed nothing in $DIR" >&2; exit 1; }
   fi
   ;;
-review) # delegate.sh review [dir] [--uncommitted | --base <branch>]
-  [ -x "$CODEX" ] || die "codex not installed"
-  shift; rdir="$PWD"; flags=()
+review) # delegate.sh review [dir] [--uncommitted|--base <branch>] [--by claude|codex]
+  shift; rdir="$PWD"; flags=(); by=""
   while [ $# -gt 0 ]; do
     case "$1" in
-      --skill|--force-skill) die "review does not take --skill; it runs a fixed codex review" ;;
+      --skill|--force-skill) die "review does not take --skill; it runs a fixed review" ;;
+      --by) by="${2:?--by needs claude or codex}"; shift 2 ;;
       --base) flags+=(--base "${2:?--base needs a branch}"); shift 2 ;;
       -*) flags+=("$1"); shift ;;
       *) rdir="$1"; shift ;;
@@ -228,9 +236,33 @@ review) # delegate.sh review [dir] [--uncommitted | --base <branch>]
   done
   [ -d "$rdir" ] || die "not a directory: $rdir"
   [ ${#flags[@]} -gt 0 ] || flags=(--uncommitted)
-  ( cd "$rdir" && "$CODEX" review "${flags[@]}" </dev/null )
-  ;;
+  # Reviewing with the same vendor that wrote the code mostly confirms it, so default to the other
+  # one: inside Codex review with Claude, otherwise review with Codex.
+  [ -n "$by" ] || { [ "$(host_agent)" = codex ] && by=claude || by=codex; }
+  case "$by" in
+  codex)
+    [ -x "$CODEX" ] || die "codex not installed (try --by claude)"
+    ( cd "$rdir" && "$CODEX" review "${flags[@]}" </dev/null )
+    ;;
+  claude)
+    [ -x "$AGY" ] || die "antigravity not installed, so no Claude reviewer is available"
+    # Antigravity cannot run shell here, so hand it the diff rather than expecting it to fetch one.
+    case "${flags[*]}" in
+      *--base*) base="${flags[1]}"; d="$(git -C "$rdir" diff "$base"...HEAD 2>/dev/null)" ;;
+      *) d="$(git -C "$rdir" diff HEAD 2>/dev/null; git -C "$rdir" ls-files --others --exclude-standard 2>/dev/null | sed 's/^/UNTRACKED: /')" ;;
+    esac
+    [ -n "$d" ] || { echo "no changes to review"; exit 0; }
+    [ "${#d}" -le 200000 ] || die "diff is too large to review in one prompt (${#d} bytes)"
+    DIR="$rdir"; WRITE=""; SKILL=""
+    run_agy "$M_HARD" "You are an adversarial code reviewer. Find real defects in this diff:
+correctness bugs, security issues, missing error handling, broken edge cases. Be specific about
+file and line. Say plainly if you find nothing wrong -- do not invent problems.
 
+$d"
+    ;;
+  *) die "--by must be claude or codex" ;;
+  esac
+  ;;
 or) # delegate.sh or "<prompt>" [model] [--skill NAME] -- a pinned model does not fall back
   shift; [ $# -ge 1 ] || die 'usage: delegate.sh or "<prompt>" [model] [--skill NAME]'
   op="$1"; om=""; shift

@@ -23,6 +23,22 @@ denies reading files in its cwd.
 
 **Keys never enter argv.** `curl -K` reads them from a 0600 file instead, so `ps` cannot show them.
 
+## Cross-vendor review
+
+`review` detects its host from the environment (`CODEX_SESSION_ID` for Codex,
+`CLAUDE_CODE_ENTRYPOINT`/`CLAUDECODE` for Claude Code) and picks the other vendor, defaulting to
+Codex when it cannot tell. `--by` forces one.
+
+The two reviewers are not equivalent. `codex review` runs in the repo with shell access, so it can
+execute tests while reviewing. The Claude reviewer goes through Antigravity, which cannot run shell
+non-interactively, so the script hands it the diff instead (`git diff HEAD` plus untracked files, or
+`base...HEAD` with `--base`) and it reviews by reading. Diffs over 200KB are refused rather than
+truncated silently.
+
+The standalone `claude` CLI is *not* used, even when installed: on this machine it reported
+`OAuth session expired`. Antigravity already serves Claude Opus on plan allowance, so it needs no
+separate login.
+
 ## Skills
 
 Delegates do not reliably reach for a skill unprompted. Codex sometimes does; Antigravity did not,
