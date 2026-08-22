@@ -28,9 +28,8 @@ body{margin:0;background:var(--ink);color:var(--text);
 .wrap{max-width:1000px;margin:0 auto;padding:0 22px}
 a{color:var(--bright);text-decoration-color:var(--line);text-underline-offset:3px}
 a:hover{text-decoration-color:var(--claude)}
-:focus-visible{outline:2px solid var(--router);outline-offset:3px;border-radius:2px}
+:focus-visible{outline:2px solid var(--router);outline-offset:3px;border-radius:3px}
 
-/* nav is a real index — another skill is just another link */
 .rail{border-bottom:1px solid var(--line);background:rgba(14,18,32,.86);
   backdrop-filter:blur(6px);position:sticky;top:0;z-index:5}
 .rail .wrap{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap;
@@ -40,22 +39,43 @@ a:hover{text-decoration-color:var(--claude)}
 .rail a{text-decoration:none}
 .rail a:hover{color:var(--bright)}
 
-header{padding:76px 0 4px}
+header{padding:74px 0 4px}
 h1{font-family:var(--display);font-weight:700;color:var(--bright);
   font-size:clamp(26px,5vw,46px);line-height:1.14;letter-spacing:-.02em;margin:0 0 20px;max-width:16ch}
 h1 em{font-style:normal;color:var(--claude)}
-.lede{font-size:17px;max-width:62ch;margin:0 0 12px}
+.lede{font-size:17px;max-width:62ch;margin:0 0 30px}
 .lede strong{color:var(--bright);font-weight:500}
-.byline{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin:0 0 34px}
 
-/* ── signature: a real captured session ── */
+/* ── skill switcher: radios + labels, so it works with CSS alone ── */
+.switch{margin-bottom:14px}
+.switch>input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.tabbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+  font-family:var(--mono);font-size:13px;margin-bottom:14px}
+.tabbar .eyebrow{color:var(--dim);font-size:11.5px;letter-spacing:.06em;
+  text-transform:uppercase;margin-right:6px}
+.tabbar label{color:var(--dim);border:1px solid var(--line);border-radius:99px;
+  padding:6px 14px;cursor:pointer;background:var(--panel)}
+.tabbar label:hover{color:var(--bright);border-color:var(--router)}
+.tabbar label.soon{opacity:.72}
+#s-delegate:checked~.tabbar label[for=s-delegate],
+#s-own:checked~.tabbar label[for=s-own]{color:var(--ink);background:var(--bright);border-color:var(--bright);font-weight:600}
+#s-delegate:focus-visible~.tabbar label[for=s-delegate],
+#s-own:focus-visible~.tabbar label[for=s-own]{outline:2px solid var(--router);outline-offset:3px}
+.pane{display:none}
+#s-delegate:checked~.pane-delegate{display:block}
+#s-own:checked~.pane-own{display:block}
+
+.caption{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin:0 0 14px;max-width:74ch}
+.caption b{color:var(--text);font-weight:500}
+
+/* ── the session ── */
 .term{border:1px solid var(--line);border-radius:9px;background:var(--panel);overflow:hidden;
   box-shadow:0 18px 50px -30px #000}
 .term-bar{display:flex;gap:10px;align-items:baseline;justify-content:space-between;flex-wrap:wrap;
   padding:11px 16px;border-bottom:1px solid var(--line);background:var(--panel-2);
   font-family:var(--mono);font-size:12px;color:var(--dim)}
 .term-bar b{color:var(--text);font-weight:500}
-.term-body{padding:0 0 14px;font-family:var(--mono);font-size:13.5px;line-height:1.72}
+.term-body{padding:0 0 6px;font-family:var(--mono);font-size:13.5px;line-height:1.72}
 .step{padding:15px 16px 6px;border-top:1px solid #202744}
 .step:first-child{border-top:0}
 .cmd{color:var(--bright);margin:0;display:flex;gap:9px;align-items:flex-start;overflow-wrap:anywhere}
@@ -67,16 +87,42 @@ h1 em{font-style:normal;color:var(--claude)}
 .flag{color:var(--claude)}
 .who{font-family:var(--mono);font-size:11.5px;padding:2px 8px;border-radius:99px;
   border:1px solid;white-space:nowrap;color:var(--codex);border-color:#265c4b;background:#10241d}
-.term-foot{padding:13px 16px 0;border-top:1px solid #202744;margin-top:8px;
+.term-foot{padding:13px 16px 16px;border-top:1px solid #202744;
   font-family:var(--mono);font-size:12.5px;color:var(--dim)}
 .term-foot b{color:var(--codex)}
+.caret{display:inline-block;width:8px;height:15px;background:var(--claude);
+  vertical-align:-3px;margin-left:2px;animation:blink 1.06s steps(2,start) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* Plays out line by line. The default state is fully visible — the animation only *delays*
+   arrival, so if it never runs the transcript is still all there. */
+@keyframes arrive{from{opacity:0;transform:translateY(-2px)}to{opacity:1;transform:none}}
+.step>*{animation:arrive .3s ease backwards}
+.step:nth-child(1)>.cmd{animation-delay:.15s}
+.step:nth-child(1)>.note{animation-delay:.35s}
+.step:nth-child(1)>.res{animation-delay:.5s}
+.step:nth-child(2)>.cmd{animation-delay:.8s}
+.step:nth-child(2)>.note{animation-delay:1s}
+.step:nth-child(2)>.res{animation-delay:1.15s}
+.step:nth-child(3)>.cmd{animation-delay:1.45s}
+.step:nth-child(3)>.note{animation-delay:1.65s}
+.step:nth-child(3)>.res{animation-delay:1.8s}
+.step:nth-child(4)>.cmd{animation-delay:2.1s}
+.step:nth-child(4)>.note{animation-delay:2.3s}
+.step:nth-child(4)>.res{animation-delay:2.45s}
+.step:nth-child(5)>.cmd{animation-delay:2.75s}
+.step:nth-child(5)>.note{animation-delay:2.95s}
+.step:nth-child(5)>.res{animation-delay:3.1s}
+.step:nth-child(6)>.cmd{animation-delay:3.4s}
+.step:nth-child(6)>.note{animation-delay:3.6s}
+.step:nth-child(6)>.res{animation-delay:3.75s}
+.term-foot{animation:arrive .3s 4.05s ease backwards}
 
 section{padding:64px 0 0}
 h2{font-family:var(--display);font-weight:500;color:var(--bright);font-size:15px;
   letter-spacing:.04em;margin:0 0 7px;text-transform:lowercase}
 .sub{color:var(--dim);font-size:14.5px;margin:0 0 22px;max-width:64ch}
 
-/* install: three plain blocks — nothing to click, so nothing can fail to respond */
 .how{border:1px solid var(--line);border-radius:9px;background:var(--panel);padding:17px;margin-bottom:12px}
 .how h3{font-family:var(--mono);font-size:13px;color:var(--bright);font-weight:600;margin:0 0 6px}
 .how p{margin:0 0 12px;font-size:14.5px;color:var(--text)}
@@ -112,6 +158,11 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
   .res,.note{margin-left:0}
   .rail .wrap{font-size:11.5px;gap:13px}
 }
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .step>*,.term-foot{animation:none}
+  .caret{animation:none;opacity:.5}
+}
 </style>
 </head>
 <body>
@@ -121,7 +172,6 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
   <a href="#session">session</a>
   <a href="#install">install</a>
   <a href="#providers">providers</a>
-  <a href="#index">skills</a>
   <a href="https://github.com/krzysztofradomski/skills">github &#8599;</a>
 </div></nav>
 
@@ -132,75 +182,118 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
   <p class="lede">Agent skills for Claude Code and Codex CLI. <strong>delegate</strong> sizes up a task,
   picks a model that matches its difficulty, and hands it to a provider you already pay a subscription
   for — so most of the work costs nothing extra.</p>
-  <p class="byline">Below is a real session, captured as it ran. Paths shortened; output otherwise unedited.</p>
 </header>
 
-<div class="term" id="session">
-  <div class="term-bar">
-    <b>fixing a bug in a shopping cart, start to finish</b>
-    <span>6 commands · 4 providers · $0</span>
-  </div>
-  <div class="term-body">
+<div class="switch" id="session">
+  <input type="radio" name="skill" id="s-delegate" checked>
+  <input type="radio" name="skill" id="s-own">
 
-    <div class="step">
-      <p class="cmd">delegate.sh providers</p>
-      <p class="note">Who is available, and which model each tier is wired to.</p>
-      <p class="res">antigravity  available (plan) hard=claude-opus-4-6-thinking code=claude-sonnet-4-6
+  <div class="tabbar">
+    <span class="eyebrow">skill</span>
+    <label for="s-delegate">delegate</label>
+    <label for="s-own" class="soon">writing your own</label>
+  </div>
+
+  <div class="pane pane-delegate">
+    <p class="caption">A <b>prepared demo</b>, not a screen recording of production work: a throwaway
+    repo with one deliberately unvalidated function, so the flow fits on a page. The commands, the
+    models and every line of output are real and unedited — only the file paths are shortened.</p>
+
+    <div class="term">
+      <div class="term-bar">
+        <b>fixing a bug in a shopping cart, start to finish</b>
+        <span>6 commands · 4 providers · $0</span>
+      </div>
+      <div class="term-body">
+
+        <div class="step">
+          <p class="cmd">delegate.sh providers</p>
+          <p class="note">Who is available, and which model each tier is wired to.</p>
+          <p class="res">antigravity  available (plan) hard=claude-opus-4-6-thinking code=claude-sonnet-4-6
              read=gemini-3.7-flash-high cheap=gemini-3.7-flash-low
 codex        available (plan: chatgpt)
 openrouter   key present (not verified; use: providers --check)
 ai-studio    key present (images blocked on free tier)</p>
-    </div>
+        </div>
 
-    <div class="step">
-      <p class="cmd">delegate.sh read "List every exported function in src/cart.js"</p>
-      <p class="note">Reading is cheap work, so it goes to Gemini Flash. <span class="who">free · plan</span></p>
-      <p class="res">- subtotal (src/cart.js:1-3): Calculates the total sum of items in the cart by
+        <div class="step">
+          <p class="cmd">delegate.sh read "List every exported function in src/cart.js"</p>
+          <p class="note">Reading is cheap work, so it goes to Gemini Flash. <span class="who">free · plan</span></p>
+          <p class="res">- subtotal (src/cart.js:1-3): Calculates the total sum of items in the cart by
   multiplying each item's price by its quantity.
 - applyDiscount (src/cart.js:5-7): Computes the discounted total by applying
   a given percentage reduction to an amount.</p>
-    </div>
+        </div>
 
-    <div class="step">
-      <p class="cmd">delegate.sh code "applyDiscount does not validate percent. Add a guard that throws a RangeError when it is below 0 or above 100." --write</p>
-      <p class="note">A bounded change you could hand a competent stranger, so Claude Sonnet writes it. <span class="who">free · plan</span></p>
-      <p class="res">Done. applyDiscount now throws a RangeError before any calculation when percent
+        <div class="step">
+          <p class="cmd">delegate.sh code "applyDiscount does not validate percent. Add a guard that throws a RangeError when it is below 0 or above 100." --write</p>
+          <p class="note">A bounded change you could hand a competent stranger, so Claude Sonnet writes it. <span class="who">free · plan</span></p>
+          <p class="res">Done. applyDiscount now throws a RangeError before any calculation when percent
 is outside [0, 100]. Everything else in the file is unchanged.</p>
-    </div>
+        </div>
 
-    <div class="step">
-      <p class="cmd">git diff</p>
-      <p class="note">Read the diff yourself — a delegate reporting success is a claim, not evidence. delegate also checks the files really changed.</p>
-      <p class="res"> src/cart.js | 3 +++
+        <div class="step">
+          <p class="cmd">git diff</p>
+          <p class="note">Read the diff yourself — a delegate reporting success is a claim, not evidence. delegate also checks the files really changed.</p>
+          <p class="res"> src/cart.js | 3 +++
 
  function applyDiscount(total, percent) {
 <span class="add">+  if (percent &lt; 0 || percent &gt; 100) {
 +    throw new RangeError('percent must be between 0 and 100');
 +  }</span>
    return total - (total * percent / 100);</p>
-    </div>
+        </div>
 
-    <div class="step">
-      <p class="cmd">delegate.sh review --uncommitted</p>
-      <p class="note">Claude wrote it, so Codex reviews it. A model reviewing its own work mostly agrees with itself. <span class="who">free · plan</span></p>
-      <p class="res"><span class="flag">- [P2] Reject nonnumeric discount percentages — src/cart.js:6</span>
+        <div class="step">
+          <p class="cmd">delegate.sh review --uncommitted</p>
+          <p class="note">Claude wrote it, so Codex reviews it. A model reviewing its own work mostly agrees with itself. <span class="who">free · plan</span></p>
+          <p class="res"><span class="flag">- [P2] Reject nonnumeric discount percentages — src/cart.js:6</span>
   When percent is NaN, undefined, or a nonnumeric string, both comparisons
   evaluate to false, so the new guard is bypassed and the function returns
   NaN instead of rejecting an invalid percentage. Validate that percent is
   a finite number before applying the range check.</p>
-    </div>
+        </div>
 
-    <div class="step">
-      <p class="cmd">delegate.sh image "a flat-design shopping cart icon" cart-icon.png</p>
-      <p class="note">Two free image paths run before anything paid. The first was out of quota, so it fell through to the second.</p>
-      <p class="res"><span class="warn">[delegate] antigravity produced no image, trying codex imagegen</span>
-wrote cart-icon.png (codex imagegen, free)</p>
-    </div>
+        <div class="step">
+          <p class="cmd">delegate.sh image "a flat-design shopping cart icon" cart-icon.png</p>
+          <p class="note">Image generation has its own small quota, separate from the model quota — and it was spent. Two free paths run before anything paid, so the second picked it up.</p>
+          <p class="res"><span class="warn">[delegate] antigravity produced no image, trying codex imagegen</span>
+wrote cart-icon.png (codex imagegen, free)<span class="caret"></span></p>
+        </div>
 
+      </div>
+      <div class="term-foot">
+        Spend for that session: <b>nothing</b>. Every step ran on a subscription that was already being
+        paid for — and the review caught a real hole in the guard that had just been written.
+      </div>
+    </div>
   </div>
-  <div class="term-foot">
-    Spend for that session: <b>nothing</b>. Every step ran on a subscription that was already being paid for —
-    and the review caught a real hole in the guard that had just been written.
+
+  <div class="pane pane-own">
+    <p class="caption">There is one skill here so far. This tab is where the next ones will appear —
+    and what you need if you would rather build your own.</p>
+    <div class="how">
+      <h3>A skill is a folder</h3>
+      <p>Drop it in and the installer picks it up. Any directory holding a <code>SKILL.md</code> counts;
+      there is no manifest to register it in.</p>
+      <pre>skill-name/
+├── SKILL.md      # required: frontmatter (name, description) + instructions
+├── REFERENCE.md  # optional: detail the agent loads only when it needs it
+├── README.md     # optional: for humans — install, requirements, limits
+└── scripts/      # optional: work better done in code than re-derived</pre>
+    </div>
+    <div class="how">
+      <h3>The description is the whole interface</h3>
+      <p>It is the only part your agent reads when deciding whether a skill applies, so it has to say
+      what the skill does <em>and</em> when to reach for it. Keep <code>SKILL.md</code> short and push
+      detail into <code>REFERENCE.md</code> — everything in the main file costs context on every load.</p>
+    </div>
+    <div class="how">
+      <h3>Two things worth stealing from delegate</h3>
+      <p>Put a guard in code rather than documenting a rule and hoping the model follows it. And never
+      let a skill spend money without an explicit flag.</p>
+      <p class="aside"><a href="https://github.com/krzysztofradomski/skills/tree/main/delegate">Read the delegate source ↗</a></p>
+    </div>
   </div>
 </div>
 
@@ -259,21 +352,6 @@ ln -s "$PWD/delegate/scripts/delegate.sh" ~/.local/bin/</pre>
     <li><b>checks that work actually happened</b> — after a write it verifies the files changed, because some models report success having touched nothing.</li>
     <li><b>never spends money quietly</b> — two free image paths run first, and the paid one needs an explicit flag.</li>
   </ul>
-</section>
-
-<section id="index">
-  <h2>skills in this repo</h2>
-  <p class="sub">One so far. Each is a self-contained folder, so you install only what you want.</p>
-  <table>
-    <thead><tr><th>skill</th><th>works in</th><th>what it does</th></tr></thead>
-    <tbody>
-      <tr>
-        <td><a href="https://github.com/krzysztofradomski/skills/tree/main/delegate">delegate</a></td>
-        <td>Claude Code · Codex</td>
-        <td>Routes work to the cheapest capable provider, reviews across vendors, generates images for free.</td>
-      </tr>
-    </tbody>
-  </table>
 </section>
 
 <footer>

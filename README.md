@@ -109,10 +109,11 @@ it explicitly (`/delegate`) when you want to be certain, or when the phrasing is
 ## Site
 
 [`site/`](site/) is a single self-contained `index.html`: a landing page built around a real
-`delegate` session, captured as it ran — reading a file, writing a fix, catching a bug in that fix
-through cross-vendor review, and generating an image, all on plan allowance. No JavaScript, no build
-step, no dependencies beyond Google Fonts. Drop the folder into Cloudflare Pages (or any static host)
-as-is.
+`delegate` session against a prepared demo repo — reading a file, writing a fix, catching a bug in
+that fix through cross-vendor review, and generating an image, all on plan allowance. The transcript
+plays out line by line, and a tab bar switches between skills; both are CSS-only, so there is **no
+JavaScript** on the page at all. No build step and no dependencies beyond Google Fonts — drop the
+folder into Cloudflare Pages (or any static host) as-is.
 
 ## Writing a skill
 
