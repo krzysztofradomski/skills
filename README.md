@@ -1,5 +1,9 @@
 # skills
 
+> My own personal agent skills, built for how I work — shared in case they are useful to you too.
+> Nothing here is an official or supported product: expect opinionated defaults, and read a skill's
+> README before running it. Fork it, strip out what does not fit, keep what does.
+
 Agent skills for [Claude Code](https://claude.com/claude-code) and
 [Codex CLI](https://developers.openai.com/codex/cli).
 
