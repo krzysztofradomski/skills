@@ -44,8 +44,11 @@ delegate.sh providers
 — Antigravity and Codex authenticate through their own CLIs, so if either is installed and logged
 in, you can start delegating immediately.
 
-API keys are optional and only unlock OpenRouter's free models and the paid image fallback. They are
-read from files so they never appear in argv or shell history:
+API keys are optional — they only add OpenRouter and Google AI Studio. Both are read from files, so
+they never appear in argv or shell history.
+
+**OpenRouter** ([get a key](https://openrouter.ai/keys)) unlocks free frontier models for `or`, and
+is the last-resort paid image provider:
 
 ```bash
 mkdir -p ~/.config/openrouter
@@ -53,8 +56,20 @@ printf 'OpenRouter key: '; read -rs k; echo
 printf '%s' "$k" > ~/.config/openrouter/key; chmod 600 ~/.config/openrouter/key; unset k
 ```
 
-`$OPENROUTER_API_KEY` and `$GEMINI_API_KEY` (or `~/.config/google-ai/key`) work too.
-Verify with `delegate.sh providers --check`, which exits nonzero if a key is rejected.
+**Google AI Studio** ([get a key](https://aistudio.google.com/apikey)) is tried first for images:
+
+```bash
+mkdir -p ~/.config/google-ai
+printf 'AI Studio key: '; read -rs k; echo
+printf '%s' "$k" > ~/.config/google-ai/key; chmod 600 ~/.config/google-ai/key; unset k
+```
+
+Its free tier grants **zero** image quota (`RESOURCE_EXHAUSTED`, `limit: 0`) until billing is enabled
+on the Google project, so without billing this key changes nothing and images come from the free
+paths anyway.
+
+`$OPENROUTER_API_KEY` and `$GEMINI_API_KEY` work too. Verify with `delegate.sh providers --check`,
+which validates the OpenRouter key against the API and exits nonzero if it is rejected.
 
 ## Usage
 

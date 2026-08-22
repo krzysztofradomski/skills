@@ -100,6 +100,47 @@ Requirements and configuration differ per skill. Read that skill's own README be
 `delegate`, for example, wants API keys for its optional providers and can spend money if you opt in
 with a flag.
 
+## API keys
+
+Nothing here needs an API key to be useful. Antigravity and Codex authenticate through their own
+CLIs — install them, sign in once, and `delegate.sh providers` will show them. Keys only add the two
+optional providers below.
+
+**OpenRouter** — unlocks free frontier models for one-shot text (`delegate.sh or`), and acts as the
+last-resort paid image provider. Get a key at [openrouter.ai/keys](https://openrouter.ai/keys):
+
+```bash
+mkdir -p ~/.config/openrouter
+printf 'OpenRouter key: '; read -rs k; echo
+printf '%s' "$k" > ~/.config/openrouter/key; chmod 600 ~/.config/openrouter/key; unset k
+```
+
+**Google AI Studio** — tried first for images. Get a key at
+[aistudio.google.com/apikey](https://aistudio.google.com/apikey):
+
+```bash
+mkdir -p ~/.config/google-ai
+printf 'AI Studio key: '; read -rs k; echo
+printf '%s' "$k" > ~/.config/google-ai/key; chmod 600 ~/.config/google-ai/key; unset k
+```
+
+Worth knowing before you bother: **AI Studio's free tier grants zero image quota.** Every image model
+returns `RESOURCE_EXHAUSTED` with `limit: 0` until billing is enabled on the Google project, so in
+practice this key changes nothing for images and the chain falls through to the free paths. Its
+free-tier *text* does work, but Antigravity already covers text better and on plan allowance. Set it
+if you have billing enabled or want it ready; skip it otherwise.
+
+Both keys are read from files rather than passed as arguments, so they never land in your shell
+history or in `ps` output. `$OPENROUTER_API_KEY` and `$GEMINI_API_KEY` work too if you prefer
+environment variables. Check what actually works:
+
+```bash
+delegate.sh providers --check
+```
+
+That validates the OpenRouter key against the API and exits nonzero if it is rejected — a key file
+existing proves nothing.
+
 ## Using a skill
 
 You do not need to invoke a skill by name. Describe what you want, and the agent loads the skill

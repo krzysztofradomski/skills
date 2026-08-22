@@ -158,6 +158,7 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
   <a class="home" href="#top">skills<span> / krzysztofradomski</span></a>
   <a href="#session">session</a>
   <a href="#install">install</a>
+  <a href="#keys">keys</a>
   <a href="#providers">providers</a>
   <a href="https://github.com/krzysztofradomski/skills">github &#8599;</a>
 </div></nav>
@@ -297,6 +298,42 @@ cd ~/code/skills
 ln -s "$PWD/delegate" ~/.claude/skills/delegate
 ln -s "$PWD/delegate" ~/.codex/skills/delegate
 ln -s "$PWD/delegate/scripts/delegate.sh" ~/.local/bin/</pre>
+  </div>
+</section>
+
+<section id="keys">
+  <h2>api keys</h2>
+  <p class="sub">None are required. Antigravity and Codex sign in through their own CLIs, and that
+  covers every default path. Keys only add the two optional providers below.</p>
+
+  <div class="how">
+    <h3>OpenRouter — free frontier models, and the paid image fallback</h3>
+    <p>Get one at <a href="https://openrouter.ai/keys">openrouter.ai/keys</a>. Read from a file, so it
+    never lands in your shell history or in <code>ps</code> output.</p>
+    <pre>mkdir -p ~/.config/openrouter
+printf 'OpenRouter key: '; read -rs k; echo
+printf '%s' "$k" &gt; ~/.config/openrouter/key; chmod 600 ~/.config/openrouter/key; unset k</pre>
+  </div>
+
+  <div class="how">
+    <h3>Google AI Studio — tried first for images</h3>
+    <p>Get one at <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a>.</p>
+    <pre>mkdir -p ~/.config/google-ai
+printf 'AI Studio key: '; read -rs k; echo
+printf '%s' "$k" &gt; ~/.config/google-ai/key; chmod 600 ~/.config/google-ai/key; unset k</pre>
+    <p class="aside">Worth knowing before you bother: AI Studio's free tier grants <b>zero</b> image
+    quota — every image model returns <code>RESOURCE_EXHAUSTED</code> with <code>limit: 0</code> until
+    billing is enabled on the Google project. Without billing this key changes nothing for images, and
+    the chain falls through to the free paths anyway.</p>
+  </div>
+
+  <div class="how">
+    <h3>Check what actually works</h3>
+    <p>A key file existing proves nothing. This validates the OpenRouter key against the API and exits
+    nonzero if it is rejected.</p>
+    <pre>delegate.sh providers --check</pre>
+    <p class="aside"><code>$OPENROUTER_API_KEY</code> and <code>$GEMINI_API_KEY</code> work too if you
+    prefer environment variables.</p>
   </div>
 </section>
 
