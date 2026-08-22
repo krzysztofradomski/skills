@@ -7,6 +7,12 @@
 Agent skills for [Claude Code](https://claude.com/claude-code) and
 [Codex CLI](https://developers.openai.com/codex/cli).
 
+**Built Claude-first.** Claude Code is the primary target: that is where these are designed, used
+and tested. Codex CLI is a first-class second — the same `SKILL.md` loads there, every feature is
+expected to work, and where the two differ a skill adapts rather than degrades. `delegate`, for
+instance, routes code review to whichever vendor you are *not* running inside, so it is genuinely
+useful from either side.
+
 ## What a skill is
 
 A skill is a folder containing a `SKILL.md`: a description of some capability, plus instructions for
@@ -23,7 +29,38 @@ read this same format from their own skill directories, so one folder serves bot
 |---|---|
 | [delegate](delegate/) | Routes work to whichever provider is cheapest for the job — Antigravity and Codex on plan allowance, OpenRouter free models — matching model strength to task difficulty. Generates images for free. |
 
-## Install from this repo
+## Install
+
+### Let your agent do it
+
+Paste this to Claude Code or Codex:
+
+> Install the skills from https://github.com/krzysztofradomski/skills — clone it, then symlink the
+> skills into my agent skill directory and any bundled scripts onto my PATH. Show me what you linked.
+
+The agent reads the repo and does the rest. Ask it for just one skill if you do not want all of them.
+
+### One command
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/krzysztofradomski/skills/main/install.sh | bash
+```
+
+Piping a stranger's script into your shell is a habit worth resisting, so read it first if you
+prefer — it is short:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/krzysztofradomski/skills/main/install.sh -o install.sh
+less install.sh && bash install.sh
+```
+
+It clones to `~/.local/share/agent-skills`, symlinks each skill into `~/.claude/skills` (and
+`~/.codex/skills` when Codex is present), and puts bundled scripts on your `PATH`. Re-running it
+updates the clone. It never overwrites a real directory — if something is already there under that
+name it says so and skips. Pass names to install a subset (`bash install.sh delegate`), and set
+`SKILLS_DIR`, `CLAUDE_DIR`, `CODEX_DIR` or `BIN_DIR` to put things elsewhere.
+
+### By hand
 
 Clone the repo wherever you keep code, then symlink the skills you want into your agent's skill
 directory. Symlinks rather than copies: edits and `git pull`s take effect immediately instead of
@@ -78,6 +115,9 @@ skill-name/
 ├── README.md       # optional: for humans — install, requirements, limitations
 └── scripts/        # optional: deterministic work better done in code than re-derived
 ```
+
+Drop a new folder in and `install.sh` picks it up — it treats any directory containing a `SKILL.md`
+as installable, with no manifest to update.
 
 The `description` is the only thing the agent sees when deciding whether to load the skill, so it
 has to say both what the skill does and when to reach for it. Keep `SKILL.md` short and push detail

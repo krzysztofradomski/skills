@@ -1,6 +1,6 @@
 # delegate
 
-An orchestrator skill for Claude Code and Codex CLI. It pushes work down to whichever provider is
+An orchestrator skill for Claude Code (primary) and Codex CLI (equally supported). It pushes work down to whichever provider is
 cheapest for the job — matching model strength to task difficulty — and keeps paid APIs behind an
 explicit opt-in.
 
@@ -23,7 +23,15 @@ Antigravity and Codex bill against a subscription, not per-token, so most work c
 
 ## Install
 
-From the root of your clone of [the skills repo](https://github.com/krzysztofradomski/skills):
+Easiest is the repo installer, which links this skill into both agents and puts the script on your
+`PATH`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/krzysztofradomski/skills/main/install.sh | bash -s delegate
+```
+
+Or by hand, from the root of your clone of
+[the skills repo](https://github.com/krzysztofradomski/skills):
 
 ```bash
 ln -s "$PWD/delegate" ~/.claude/skills/delegate                 # Claude Code
