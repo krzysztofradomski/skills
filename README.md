@@ -7,6 +7,11 @@
 Agent skills for [Claude Code](https://claude.com/claude-code) and
 [Codex CLI](https://developers.openai.com/codex/cli).
 
+The skills run from the agent you are already using. `delegate` reaches across provider boundaries
+from that one session: stay in Claude Code while handing work to Antigravity or Codex, or stay in
+Codex while Claude handles a task. That means you can use the plan allowances you already have
+without manually moving work between IDEs or chat apps.
+
 **Built Claude-first.** Claude Code is the primary target: that is where these are designed, used
 and tested. Codex CLI is a first-class second — the same `SKILL.md` loads there, every feature is
 expected to work, and where the two differ a skill adapts rather than degrades. `delegate`, for
@@ -27,7 +32,7 @@ read this same format from their own skill directories, so one folder serves bot
 
 | Skill | What it does |
 |---|---|
-| [delegate](delegate/) | Routes work to whichever provider is cheapest for the job — Antigravity and Codex on plan allowance, OpenRouter free models — matching model strength to task difficulty. Generates images for free. |
+| [delegate](delegate/) | Routes work across providers without leaving your current agent, matching model strength and cost to each task. Uses Antigravity and Codex plan allowances and OpenRouter free models; also generates images. |
 
 ## Install
 

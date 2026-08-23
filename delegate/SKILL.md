@@ -1,12 +1,14 @@
 ---
 name: delegate
-description: Delegate work to cheaper providers - Antigravity CLI, Codex CLI, and OpenRouter free models - picking a model that matches the task's difficulty. Use when the user says delegate, orchestrate, use a cheaper model, save tokens, run a code review, or asks for sub-agents. Also generates images for free.
+description: Delegate work from the current Claude Code or Codex session to other providers - Antigravity CLI, Codex CLI, and OpenRouter free models - using existing plan allowances without switching IDEs or chat apps, and picking a model that matches the task's difficulty and cost. Use when the user says delegate, orchestrate, use another provider, use a cheaper model, save tokens, run a code review, or asks for sub-agents. Also generates images for free.
 ---
 
 # Delegate
 
-You are the **orchestrator**: you own requirements, architecture and integration. Delegates do work
-you have already specified. Never accept a delegate's output unreviewed.
+You are the **orchestrator** in the user's current agent: you own requirements, architecture and
+integration while delegates from other providers do work you have already specified. Keep the user
+in this session and bring the delegated result back here. Never accept a delegate's output
+unreviewed.
 
 ## Quick start
 

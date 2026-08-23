@@ -1,8 +1,10 @@
 # delegate
 
-An orchestrator skill for Claude Code (primary) and Codex CLI (equally supported). It pushes work down to whichever provider is
-cheapest for the job — matching model strength to task difficulty — and keeps paid APIs behind an
-explicit opt-in.
+An orchestrator skill for Claude Code (primary) and Codex CLI (equally supported). It lets you stay
+in the agent you chose while handing work to other providers, so you can use the plan allowances you
+already have without manually moving work between IDEs or chat apps — or copying prompts and
+context. It also matches model strength and cost to the task, and keeps paid APIs behind an explicit
+opt-in.
 
 | Provider | Auth | Used for |
 |---|---|---|
@@ -77,6 +79,10 @@ In an agent session you rarely call this directly — say "delegate this to a ch
 "review my changes" and the agent picks the right verb. Run it yourself when you want a specific
 model, or to check what is available. Each verb targets a tier: `read` and `cheap` for fast Gemini
 work, `code` and `hard` for Claude reasoning, `codex` for anything that must run tests.
+
+The provider can differ from the agent running the session: Claude Code can delegate to Antigravity
+or Codex, and Codex can delegate to Claude through Antigravity. The work returns to the session you
+are already using.
 
 See [SKILL.md](SKILL.md) for routing guidance and [REFERENCE.md](REFERENCE.md) for provider quirks.
 

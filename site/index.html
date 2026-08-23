@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>skills — agent skills by Krzysztof Radomski</title>
-<meta name="description" content="Personal agent skills for Claude Code and Codex CLI. Route work to the cheapest model that can do it.">
+<meta name="description" content="Stay in Claude Code or Codex while routing work to other providers through plan allowances you already have. Match each task to the cheapest capable model.">
 <meta property="og:title" content="skills — agent skills for Claude Code and Codex">
-<meta property="og:description" content="Route work to the cheapest thing that can do it. Free on plan allowance, paid only when you ask.">
+<meta property="og:description" content="Use other providers from the agent you are already in. Draw on existing plan allowances and route each task to the cheapest capable model.">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -166,10 +166,10 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
 <div class="wrap" id="top">
 
 <header>
-  <h1>Route work to the <em>cheapest thing</em> that can do it.</h1>
-  <p class="lede">Agent skills for Claude Code and Codex CLI. <strong>delegate</strong> sizes up a task,
-  picks a model that matches its difficulty, and hands it to a provider you already pay a subscription
-  for — so most of the work costs nothing extra.</p>
+  <h1>Use the <em>right provider</em>. Stay in one place.</h1>
+  <p class="lede">Agent skills for Claude Code and Codex CLI. <strong>delegate</strong> reaches other
+  providers from the session you are already in, matches each task to the cheapest capable model,
+  and uses plan allowances you already pay for — no moving work between IDEs or chat apps.</p>
 </header>
 
 <div class="switch" id="session">
@@ -355,6 +355,7 @@ printf '%s' "$k" &gt; ~/.config/google-ai/key; chmod 600 ~/.config/google-ai/key
 <section id="why">
   <h2>what it actually does for you</h2>
   <ul class="plain">
+    <li><b>keeps you in the agent you chose</b> — work in Claude Code while Codex or Antigravity handles a task, or work in Codex while Claude handles it. The result comes back to the same session.</li>
     <li><b>picks a model that fits the job</b> — a rename does not need the model you would hand a security review, and a security review should not go to the fast one.</li>
     <li><b>reviews across vendors</b> — inside Claude Code, Codex reviews your diff; inside Codex, Claude does. In the session above that caught a real hole in a guard Claude had just written.</li>
     <li><b>checks that work actually happened</b> — after a write it verifies the files changed, because some models report success having touched nothing.</li>
