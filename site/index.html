@@ -831,6 +831,14 @@ ln -s "$PWD/delegate/scripts/delegate.sh" ~/.local/bin/
 ln -s "$PWD/gif/scripts/gif.sh" ~/.local/bin/
 ln -s "$PWD/svg/scripts/svg.sh" ~/.local/bin/</pre>
   </div>
+
+  <div class="how">
+    <h3>npx skills</h3>
+    <p>Resolves this site's <a href="/.well-known/agent-skills/index.json">discovery index</a> and
+    verifies the skill's digest before installing anything.</p>
+    <pre>npx skills add https://ai-skills.radomski.dev --skill delegate -a claude-code -g   # one skill
+npx skills add https://ai-skills.radomski.dev --skill '*' -a claude-code -g        # all of them</pre>
+  </div>
 </section>
 
 <section id="keys">

@@ -93,6 +93,19 @@ Clone anywhere you like — `$PWD` keeps the commands correct whatever path you 
 the skills you want; each folder is independent, and installing one directory does not pull in the
 rest.
 
+### From an agent skills installer
+
+[ai-skills.radomski.dev](https://ai-skills.radomski.dev) serves a
+`.well-known/agent-skills/index.json` discovery index, so any installer that reads that convention
+can resolve a skill directly:
+
+```bash
+npx skills add https://ai-skills.radomski.dev --skill delegate -a claude-code -g   # one skill
+npx skills add https://ai-skills.radomski.dev --skill '*' -a claude-code -g        # all of them
+```
+
+The installer verifies the payload's `sha256:` digest before writing anything to disk.
+
 Some skills ship a script. Put it on your `PATH` so both you and the agent can run it by name:
 
 ```bash
@@ -199,6 +212,16 @@ skill-name/
 
 Drop a new folder in and `install.sh` picks it up — it treats any directory containing a `SKILL.md`
 as installable, with no manifest to update.
+
+After adding or changing a skill, regenerate the discovery index before deploying `site/`:
+
+```bash
+scripts/build-agent-skills-index.sh
+```
+
+It re-hashes each skill (single-file skills as their bare `SKILL.md`, multi-file skills as a flat
+`<name>.tar.gz`) into `site/agent-skills/` and writes `site/.well-known/agent-skills/index.json`
+with a `sha256:` digest per skill, so the digest served always matches the bytes served.
 
 The `description` is the only thing the agent sees when deciding whether to load the skill, so it
 has to say both what the skill does and when to reach for it. Keep `SKILL.md` short and push detail
