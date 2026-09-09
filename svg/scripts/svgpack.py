@@ -11,7 +11,16 @@ import os
 import re
 import signal
 import sys
+import urllib.parse
 import xml.etree.ElementTree as ET
+
+def linked(path):
+    """The path as an OSC 8 hyperlink, so a terminal that supports them opens the file on a
+    click. Plain text when stdout is not a terminal, which keeps captured output parsable."""
+    if not sys.stdout.isatty():
+        return path
+    url = "file://" + urllib.parse.quote(os.path.abspath(path))
+    return "\033]8;;%s\033\\%s\033]8;;\033\\" % (url, path)
 
 SVG_NS = "http://www.w3.org/2000/svg"
 XLINK_NS = "http://www.w3.org/1999/xlink"
@@ -566,7 +575,7 @@ def cmd_build(a):
     with open(a.out, "w", encoding="utf-8") as fh:
         fh.write(out)
     print("wrote %s (%dx%d, %s, %s, %d bytes%s)"
-          % (a.out, a.size, a.size, note,
+          % (linked(a.out), a.size, a.size, note,
              "transparent" if not bg else "background %s" % bg,
              len(out.encode("utf-8")),
              ", %d attrs rounded" % rounded if rounded else ""))

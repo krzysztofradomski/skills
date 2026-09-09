@@ -11,11 +11,21 @@ import math
 import os
 import signal
 import sys
+import urllib.parse
 
 try:
     from PIL import Image
 except ImportError:
     sys.exit("gifpack: Pillow is required -- pip install pillow, or brew install pillow on Homebrew python")
+
+def linked(path):
+    """The path as an OSC 8 hyperlink, so a terminal that supports them opens the file on a
+    click. Plain text when stdout is not a terminal, which keeps captured output parsable."""
+    if not sys.stdout.isatty():
+        return path
+    url = "file://" + urllib.parse.quote(os.path.abspath(path))
+    return "\033]8;;%s\033\\%s\033]8;;\033\\" % (url, path)
+
 
 SIZES = (16, 32, 64, 128)
 MAX_DURATION = 3.0
@@ -209,7 +219,7 @@ def cmd_build(a):
     # file can hold fewer frames than we passed. Report what it actually holds.
     written = getattr(Image.open(a.out), "n_frames", len(out))
     print("wrote %s (%dx%d, %d frame%s, %.2fs, loop=%s, %s)"
-          % (a.out, a.size, a.size, written, "" if written == 1 else "s", sum(delays) / 1000.0,
+          % (linked(a.out), a.size, a.size, written, "" if written == 1 else "s", sum(delays) / 1000.0,
              "forever" if a.loop == 0 else a.loop,
              "transparent" if transparent else "opaque"))
 
