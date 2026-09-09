@@ -8,7 +8,10 @@ Details behind [SKILL.md](SKILL.md). Read when output looks wrong or a flag need
 
 1. **Generate** — one `delegate.sh image` call for a horizontal sprite sheet, or N calls with
    `--per-frame`.
-2. **Slice** — the sheet is cut into `--frames` equal columns by width, left to right.
+2. **Slice** — the sheet is cut into `--frames` equal cells, left to right and top to bottom. The
+   arrangement is read off the sheet: of the `cols x rows` pairs that multiply to the frame count,
+   the one whose cells come out closest to square wins, because the frames are square. Models asked
+   for one row return a grid often enough that assuming a row silently halves every frame.
 3. **Key** — pixels within `--fuzz` of `--matte` become transparent.
 4. **Trim** — one crop box, the *union* of every frame's content box, applied to all frames.
    Cropping each frame to its own bounds would re-centre the subject frame by frame and cancel the
@@ -62,17 +65,25 @@ Lanczos above; `--filter nearest` gives harder pixel edges, `--filter lanczos` m
 than it can actually hold. `--colors` below ~32 gives a deliberately flat retro palette; above ~128
 mostly grows the file.
 
+## Seeing the result
+
+The `wrote ...` path is an OSC 8 hyperlink when stdout is a terminal, so a click opens the file;
+piped output stays plain text. `--show` also draws the finished GIF inline, using `$IMGCAT`,
+iTerm2's `imgcat` (found at `~/.iterm2/imgcat` too, since most people alias it rather than put it
+on `PATH`), then `chafa`, then `viu`. With none of those installed it says so and the link still
+works.
+
 ## Failure modes
 
 | Symptom | Cause | Fix |
 |---|---|---|
 | Subject jumps around between frames | model redrew it per cell | regenerate; or `--keep-frames` and re-cut |
-| Frames cut mid-subject | sheet has a different frame count than asked | `gif.sh sheet <kept sheet> out.gif --cols <actual>` |
+| Frames cut mid-subject | sheet has a different frame count than asked | `gif.sh sheet <kept sheet> out.gif --cols <actual> --rows <actual>` |
 | Magenta fringe on edges | anti-aliased matte | raise `--fuzz` |
 | Subject has holes | `--fuzz` too high, or subject shares the matte color | lower `--fuzz`, or change `--matte` |
 | Whole image transparent | matte key removed everything | as above; the script refuses to write it |
 | `delegate could not generate` | daily image quota spent | retry later, or supply frames yourself |
-| Warning about sheet aspect ratio | cut is probably misaligned | inspect with `--keep-frames` |
+| Warning about cell shape | inferred layout is probably wrong | re-cut with explicit `--cols`/`--rows` |
 
 `gif.sh probe` re-reads the finished file and reports what is actually in it — size, frame count,
 per-frame delays, loop block, transparency index, bytes. Trust it over the "wrote …" line, which

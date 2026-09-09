@@ -224,6 +224,20 @@ def cmd_build(a):
              "transparent" if transparent else "opaque"))
 
 
+def grid_for(w, h, count):
+    """The (cols, rows) arrangement of `count` square frames that best explains a w x h sheet."""
+    best = None
+    for cols in range(1, count + 1):
+        if count % cols:
+            continue
+        rows = count // cols
+        cell = (w * 1.0 / cols) / (h * 1.0 / rows)      # 1.0 when the cell is square
+        score = abs(math.log(cell))
+        if best is None or score < best[0]:
+            best = (score, cols, rows)
+    return best[1], best[2]
+
+
 def cmd_slice(a):
     try:
         sheet = Image.open(a.sheet).convert("RGBA")
@@ -231,18 +245,27 @@ def cmd_slice(a):
         die("cannot read sheet %s: %s" % (a.sheet, e))
     w, h = sheet.size
     cols, rows = a.cols, a.rows
+    if not cols:
+        # Ask for one row of N and the model still lays them out as a grid whenever N is
+        # composite. The frames are square, so the arrangement it chose is the factor pair
+        # whose cells come out closest to square -- and a wrong guess here does not merely
+        # look off: every cell straddles two frames, so the matte no longer lines up and
+        # the key leaves the backdrop behind.
+        cols, rows = grid_for(w, h, a.count)
+        if cols * rows == a.count and (cols, rows) != (a.count, 1):
+            print("gifpack: sheet is %dx%d, reading it as %d x %d" % (w, h, cols, rows),
+                  file=sys.stderr)
     if cols * rows < a.count:
         die("--cols %d x --rows %d cannot hold %d frames" % (cols, rows, a.count))
     fw, fh = w // cols, h // rows
     if fw == 0 or fh == 0:
         die("sheet %dx%d is too small to cut into %dx%d cells" % (w, h, cols, rows))
-    # A model asked for N frames in a row usually returns something close to N:1.
+    # Even the best arrangement can be wrong if the model drew something else entirely.
     # Warn rather than fail: the cut may still be usable, and the caller can look.
-    want = (cols * 1.0) / rows
-    got = (w * 1.0) / h
-    if abs(got - want) > 0.25 * want:
-        print("gifpack: warning: sheet aspect %.2f:1 is far from the %.2f:1 implied by "
-              "--cols/--rows; frames are probably misaligned" % (got, want), file=sys.stderr)
+    if not 0.7 <= (fw * 1.0) / fh <= 1.43:
+        print("gifpack: warning: cutting %dx%d into %d x %d gives %dx%d cells, which are not "
+              "square; frames are probably misaligned" % (w, h, cols, rows, fw, fh),
+              file=sys.stderr)
     os.makedirs(a.outdir, exist_ok=True)
     n = 0
     for r in range(rows):
@@ -309,7 +332,7 @@ def main():
     s = sub.add_parser("slice", help="cut a sprite sheet into frames")
     s.add_argument("sheet")
     s.add_argument("outdir")
-    s.add_argument("--cols", type=int, required=True)
+    s.add_argument("--cols", type=int, default=0)   # 0 = work it out from the sheet
     s.add_argument("--rows", type=int, default=1)
     s.add_argument("--count", type=int, default=0)
     s.set_defaults(func=cmd_slice)

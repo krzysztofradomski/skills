@@ -20,11 +20,22 @@ die() { echo "gif: $*" >&2; exit 2; }
 command -v "$PY" >/dev/null || die "python3 is required (or set \$PYTHON)"
 pack() { "$PY" "$PACK" "$@"; }
 
+show() { # --show: draw the finished GIF in the terminal, if the terminal can do that
+  [ -n "$show" ] && [ -t 1 ] || return 0
+  local v
+  for v in "${IMGCAT:-}" "$HOME/.iterm2/imgcat" imgcat chafa viu; do
+    [ -n "$v" ] || continue
+    if [ -x "$v" ] || command -v "$v" >/dev/null 2>&1; then "$v" "$1"; return 0; fi
+  done
+  echo "gif: --show needs imgcat (iTerm2), chafa or viu -- the link on the line above still opens it" >&2
+}
+
 MATTE="#FF00FF"   # flat backdrop we ask the model for, and key out afterwards
 
 # Defaults, all overridable per run.
 size=32; frames=8; duration=1; loop=0; colors=64; opaque=""; bg=""
 fuzz=18; trim=""; filt="auto"; keep=""; per_frame=""; paid=""; style=""; frames_set=""
+show=""
 pack_extra=()
 
 need_num() { case "$2" in ''|*[!0-9.]*) die "$1 needs a number, got '${2:-}'" ;; esac; }
@@ -47,6 +58,7 @@ parse_opts() { # consumes the flags common to every verb
       --keep-frames) keep="${2:-}"; [ -n "$keep" ] || die "--keep-frames needs a directory"; shift 2 ;;
       --style)     style="${2:-}"; [ -n "$style" ] || die "--style needs a description"; shift 2 ;;
       --per-frame) per_frame=1; shift ;;
+      --show)      show=1; shift ;;
       --paid)      paid="--paid"; shift ;;
       --) shift; REST+=("$@"); break ;;
       -*) die "unknown option $1" ;;
@@ -122,7 +134,7 @@ generate() { # subject -> prints frame paths, one per line, into $TMP/frames
     "$DELEGATE" image "$(sheet_prompt "$1")" "$TMP/sheet.png" $paid >&2 \
       || die "delegate could not generate the sprite sheet (image quota is finite; try again later, or --paid)"
     [ -f "$TMP/sheet.png" ] || die "delegate reported success but wrote no sheet"
-    pack slice "$TMP/sheet.png" "$TMP/frames" --cols "$frames" >/dev/null
+    pack slice "$TMP/sheet.png" "$TMP/frames" --count "$frames" >/dev/null
   fi
   ls "$TMP/frames"/*.png
 }
@@ -146,6 +158,7 @@ make) # gif.sh make "<subject>" out.gif [opts]
   pack build "$out" "$TMP/frames"/*.png "${pack_extra[@]}" || { keep_frames; exit 1; }
   keep_frames
   pack probe "$out"
+  show "$out"
   ;;
 frames) # gif.sh frames out.gif <dir|frame.png...> [opts]
   shift; parse_opts "$@"; set -- "${REST[@]+"${REST[@]}"}"
@@ -164,6 +177,7 @@ frames) # gif.sh frames out.gif <dir|frame.png...> [opts]
   build_opts
   pack build "$out" "${src[@]}" "${pack_extra[@]}"
   pack probe "$out"
+  show "$out"
   ;;
 sheet) # gif.sh sheet <sheet.png> out.gif [--cols N] [--rows N] [opts]
   shift; cols=""; rows=1
@@ -177,17 +191,22 @@ sheet) # gif.sh sheet <sheet.png> out.gif [--cols N] [--rows N] [opts]
   parse_opts "${args[@]+"${args[@]}"}"; set -- "${REST[@]+"${REST[@]}"}"
   [ $# -ge 2 ] || die 'usage: gif.sh sheet <sheet.png> out.gif [--cols N] [--rows N] [opts]'
   [ -f "$1" ] || die "no such sheet: $1"
-  [ -n "$cols" ] || cols="$frames"
-  # --cols alone tells us the frame count; only an explicit --frames overrides it.
-  [ -n "$frames_set" ] || frames=$((cols * rows))
+  # --cols alone tells us the frame count; only an explicit --frames overrides it. Without
+  # it, gifpack reads the layout off the sheet itself.
+  slice_args=(--count "$frames")
+  if [ -n "$cols" ]; then
+    [ -n "$frames_set" ] || frames=$((cols * rows))
+    slice_args=(--cols "$cols" --rows "$rows" --count "$frames")
+  fi
   mkdir -p "$TMP/frames"
-  pack slice "$1" "$TMP/frames" --cols "$cols" --rows "$rows" --count "$frames" >/dev/null
+  pack slice "$1" "$TMP/frames" "${slice_args[@]}" >/dev/null
   build_opts
   pack build "$2" "$TMP/frames"/*.png "${pack_extra[@]}" || { keep_frames; exit 1; }
   keep_frames
   pack probe "$2"
+  show "$2"
   ;;
-probe) shift; [ $# -ge 1 ] || die "usage: gif.sh probe <file.gif>"; pack probe "$1" ;;
+probe) shift; [ $# -ge 1 ] || die "usage: gif.sh probe <file.gif>"; pack probe "$1"; show "$1" ;;
 check)
   printf 'python3      %s\n' "$(command -v "$PY" || echo MISSING)"
   if "$PY" -c 'import PIL; print(PIL.__version__)' >/dev/null 2>&1; then
@@ -203,5 +222,5 @@ check)
        opts: --size 16|32|64|128 (32)  --frames N (8)  --duration SEC (1, max 3)  --loop N (0=forever)
              --opaque | --bg COLOR  --colors N (64)  --matte COLOR|none  --fuzz PCT (18)
              --no-trim  --filter auto|box|lanczos|nearest  --keep-frames DIR  --style "..."
-             --per-frame  --paid' ;;
+             --per-frame  --paid  --show' ;;
 esac

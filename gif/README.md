@@ -43,6 +43,7 @@ gif.sh make "a bouncing ball" ball.gif --size 64 --duration 2 --frames 12
 gif.sh make "a loading spinner" spin.gif --bg '#111827'      # opaque
 gif.sh frames out.gif ./frames --size 128 --matte none       # your own frames
 gif.sh sheet sprites.png out.gif --cols 6                    # your own sprite sheet
+gif.sh make "a spinning coin" coin.gif --show                # draw it in the terminal too
 gif.sh probe out.gif
 ```
 
@@ -53,9 +54,11 @@ skill.
 
 - **Frame quality is the image model's**, not this skill's. At 16–32px you want flat shapes and a
   strong silhouette; ornate subjects turn to noise however good the downscaler is.
-- **Sheet cutting can misalign.** The model is asked for N equal frames in one row and usually
-  obliges, but not always. `--keep-frames` keeps the sheet so you can re-cut it with `gif.sh sheet`
-  instead of spending quota on a regeneration.
+- **Sheet cutting can misalign.** The model is asked for N equal frames in one row and often
+  returns a grid instead; the cut reads the layout off the sheet, choosing the arrangement whose
+  cells come out square, and says which one it picked. When it still guesses wrong, `--keep-frames`
+  keeps the sheet so you can re-cut it with `gif.sh sheet --cols N --rows M` instead of spending
+  quota on a regeneration.
 - **Image generation has a finite daily quota** on plan allowance. When it is spent, `delegate`
   says so and `gif.sh` stops; paid providers stay behind `--paid`.
 - GIF gives you 1-bit alpha and 10ms delay steps. Both are handled here, neither can be avoided —

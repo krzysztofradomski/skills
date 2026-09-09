@@ -94,7 +94,27 @@ run "$GIF" sheet "$TMP/sheet.png" "$TMP/sh.gif" --cols 8 --size 32
 expect_ok "cuts a sheet into frames"
 [ "$(probe_field "$TMP/sh.gif" frames)" = "8" ] && pass "8 columns give 8 frames" || fail "8 columns give 8 frames"
 run "$GIF" sheet "$TMP/sheet.png" "$TMP/sh2.gif" --cols 5
-expect_has "far from the" "warns when the sheet's aspect ratio contradicts --cols"
+expect_has "misaligned" "warns when the cells --cols implies are not square"
+"$PY" - "$TMP" <<'PYGRID'
+import sys
+from PIL import Image
+tmp = sys.argv[1]
+# The same eight frames the model was asked to put in a row, laid out 4x2 as it often does.
+row = Image.open(tmp + "/sheet.png")
+S = row.height
+grid = Image.new("RGB", (S * 4, S * 2), (255, 0, 255))
+for i in range(8):
+    grid.paste(row.crop((S * i, 0, S * (i + 1), S)), (S * (i % 4), S * (i // 4)))
+grid.save(tmp + "/grid.png")
+PYGRID
+run "$GIF" sheet "$TMP/grid.png" "$TMP/sh4.gif"
+expect_ok "reads a grid sheet without being told its shape"
+expect_has "reading it as 4 x 2" "and says which layout it found"
+[ "$(probe_field "$TMP/sh4.gif" frames)" = "8" ] && pass "8 frames, not 8 half-frames" \
+  || fail "8 frames, not 8 half-frames"
+[ "$(probe_field "$TMP/sh4.gif" transparent)" = "yes (index 63)" ] && pass "and the matte still keys out" \
+  || fail "and the matte still keys out"
+
 run "$GIF" sheet "$TMP/sheet.png" "$TMP/sh3.gif" --cols 4 --keep-frames "$TMP/kept"
 expect_file "$TMP/kept/frame_00.png" "--keep-frames keeps the cut frames for re-cutting"
 
