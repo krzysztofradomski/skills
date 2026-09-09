@@ -56,11 +56,14 @@ h1 em{font-style:normal;color:var(--claude)}
 .tabbar label{color:var(--dim);border:1px solid var(--line);border-radius:99px;
   padding:6px 14px;cursor:pointer;background:var(--panel)}
 .tabbar label:hover{color:var(--bright);border-color:var(--router)}
-#s-delegate:checked~.tabbar label[for=s-delegate]{color:var(--ink);background:var(--bright);
+#s-delegate:checked~.tabbar label[for=s-delegate],
+#s-gif:checked~.tabbar label[for=s-gif]{color:var(--ink);background:var(--bright);
   border-color:var(--bright);font-weight:600}
-#s-delegate:focus-visible~.tabbar label[for=s-delegate]{outline:2px solid var(--router);outline-offset:3px}
+#s-delegate:focus-visible~.tabbar label[for=s-delegate],
+#s-gif:focus-visible~.tabbar label[for=s-gif]{outline:2px solid var(--router);outline-offset:3px}
 .pane{display:none}
 #s-delegate:checked~.pane-delegate{display:block}
+#s-gif:checked~.pane-gif{display:block}
 
 .caption{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin:0 0 14px;max-width:74ch}
 .caption b{color:var(--text);font-weight:500}
@@ -169,15 +172,18 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
   <h1>Use the <em>right provider</em>. Stay in one place.</h1>
   <p class="lede">Agent skills for Claude Code and Codex CLI. <strong>delegate</strong> reaches other
   providers from the session you are already in, matches each task to the cheapest capable model,
-  and uses plan allowances you already pay for — no moving work between IDEs or chat apps.</p>
+  and uses plan allowances you already pay for — no moving work between IDEs or chat apps.
+  <strong>gif</strong> builds on it, turning one free image call into a small looping animation.</p>
 </header>
 
 <div class="switch" id="session">
   <input type="radio" name="skill" id="s-delegate" checked>
+  <input type="radio" name="skill" id="s-gif">
 
   <div class="tabbar">
     <span class="eyebrow">skill</span>
     <label for="s-delegate">delegate</label>
+    <label for="s-gif">gif</label>
   </div>
 
   <div class="pane pane-delegate">
@@ -267,6 +273,58 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
     </div>
   </div>
 
+  <div class="pane pane-gif">
+    <p class="caption">A skill built <b>on top of another skill</b>: <code>gif</code> spends one
+    <code>delegate</code> image call on a sprite sheet, then does every pixel of the assembly locally.
+    An <b>illustrative run</b> — the commands, the flags and the shape of the output are real, the
+    subject is not a specific recorded session.</p>
+
+    <div class="term">
+      <div class="term-bar">
+        <b>a 32px transparent looping icon, and what is really in the file</b>
+        <span>3 commands · 1 image call · $0</span>
+      </div>
+      <div class="term-body">
+
+        <div class="step">
+          <p class="cmd"><span class="type" style="--w:51ch;--dur:900ms;--d:250ms;--n:51">gif.sh make "a coin spinning end over end" coin.gif</span></p>
+          <p class="note" style="--d:1260ms">Defaults are the ones you nearly always want: 32&times;32, transparent, one second, loops forever. <span class="who">free · plan</span></p>
+          <p class="res">
+<span class="l" style="--d:1340ms">[gif] generating a sprite sheet of 8 frames</span>
+<span class="l" style="--d:1372ms">wrote coin.gif (32x32, 8 frames, 1.00s, loop=forever, transparent)</span>
+</p>
+        </div>
+
+        <div class="step">
+          <p class="cmd"><span class="type" style="--w:21ch;--dur:588ms;--d:1620ms;--n:21">gif.sh probe coin.gif</span></p>
+          <p class="note" style="--d:2260ms">What the file <em>actually</em> holds, read back off disk — not what the encoder was asked for. Note the delays: 1s over 8 frames is 12.5cs, so the remainder is spread rather than rounded away.</p>
+          <p class="res">
+<span class="l" style="--d:2340ms">size        32x32</span>
+<span class="l" style="--d:2372ms">frames      8</span>
+<span class="l" style="--d:2404ms">duration    1.00s  (delays ms: [130, 130, 130, 130, 120, 120, 120, 120])</span>
+<span class="l" style="--d:2436ms">loop        forever</span>
+<span class="l" style="--d:2468ms">transparent yes (index 63)</span>
+<span class="l" style="--d:2500ms">bytes       2016</span>
+</p>
+        </div>
+
+        <div class="step">
+          <p class="cmd"><span class="type" style="--w:53ch;--dur:900ms;--d:2760ms;--n:53">gif.sh sheet sheet.png coin-64.gif --cols 6 --size 64</span></p>
+          <p class="note" style="--d:3770ms">The model drew six frames rather than eight. Re-cut the sheet you kept instead of regenerating — image quota is daily and small.</p>
+          <p class="res">
+<span class="l" style="--d:3850ms">wrote coin-64.gif (64x64, 6 frames, 1.00s, loop=forever, transparent)<span class="caret"></span></span>
+</p>
+        </div>
+
+      </div>
+      <div class="term-foot" style="--d:4050ms">
+        The image model cannot draw transparency, so the prompt asks for a flat magenta backdrop and the
+        key removes it. Sizes stop at 16/32/64/128 and duration at three seconds — the format's own
+        limits, refused loudly rather than silently rounded.
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <section id="install">
@@ -297,7 +355,9 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
 cd ~/code/skills
 ln -s "$PWD/delegate" ~/.claude/skills/delegate
 ln -s "$PWD/delegate" ~/.codex/skills/delegate
-ln -s "$PWD/delegate/scripts/delegate.sh" ~/.local/bin/</pre>
+ln -s "$PWD/gif" ~/.claude/skills/gif
+ln -s "$PWD/delegate/scripts/delegate.sh" ~/.local/bin/
+ln -s "$PWD/gif/scripts/gif.sh" ~/.local/bin/</pre>
   </div>
 </section>
 

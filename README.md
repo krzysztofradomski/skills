@@ -33,6 +33,11 @@ read this same format from their own skill directories, so one folder serves bot
 | Skill | What it does |
 |---|---|
 | [delegate](delegate/) | Routes work across providers without leaving your current agent, matching model strength and cost to each task. Uses Antigravity and Codex plan allowances and OpenRouter free models; also generates images. |
+| [gif](gif/) | Builds small looping animated GIFs — square 16/32/64/128 px, transparent or not, up to 3s. Generates the frames through `delegate` on plan allowance, then assembles them locally. |
+
+Skills can build on each other: `gif` uses `delegate` for the one image call it needs, so its frames
+come out of a plan allowance rather than a paid image API. Install both to use it end to end —
+assembling frames you already have needs only `gif`.
 
 ## Install
 
@@ -78,6 +83,7 @@ cd ~/code/skills
 mkdir -p ~/.claude/skills ~/.codex/skills
 ln -s "$PWD/delegate" ~/.claude/skills/delegate    # Claude Code
 ln -s "$PWD/delegate" ~/.codex/skills/delegate     # Codex CLI
+ln -s "$PWD/gif" ~/.claude/skills/gif              # and the same for any other skill
 ```
 
 Clone anywhere you like — `$PWD` keeps the commands correct whatever path you chose. Install only
@@ -89,6 +95,7 @@ Some skills ship a script. Put it on your `PATH` so both you and the agent can r
 ```bash
 mkdir -p ~/.local/bin
 ln -s "$PWD/delegate/scripts/delegate.sh" ~/.local/bin/delegate.sh
+ln -s "$PWD/gif/scripts/gif.sh" ~/.local/bin/gif.sh
 ```
 
 If `~/.local/bin` is not already on your `PATH`, add it to your shell profile:
