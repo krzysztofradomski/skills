@@ -150,6 +150,10 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
   .res,.note{margin-left:0}
   .rail .wrap{font-size:11.5px;gap:13px}
 }
+/* A tab you come back to would replay from an empty terminal: display:none cancels the animations,
+   so a re-shown pane starts over. Once a transcript has run, it stays run. */
+.pane.done .step>*,.pane.done .cmd .type,.pane.done .res .l,.pane.done .term-foot{animation:none}
+
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .step>*,.cmd .type,.res .l,.term-foot{animation:none}
@@ -491,5 +495,18 @@ printf '%s' "$k" &gt; ~/.config/google-ai/key; chmod 600 ~/.config/google-ai/key
 </footer>
 
 </div>
+<script>
+// Each transcript plays once. The panes are CSS-only radio tabs, and display:none cancels a
+// running animation, so a tab you come back to would type itself out again from nothing.
+(function(){
+  var shown = document.querySelector('.pane-delegate');
+  document.querySelectorAll('input[name=skill]').forEach(function(r){
+    r.addEventListener('change', function(){
+      shown.classList.add('done');
+      shown = document.querySelector('.pane-' + r.id.slice(2));
+    });
+  });
+})();
+</script>
 </body>
 </html>
