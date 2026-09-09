@@ -57,13 +57,16 @@ h1 em{font-style:normal;color:var(--claude)}
   padding:6px 14px;cursor:pointer;background:var(--panel)}
 .tabbar label:hover{color:var(--bright);border-color:var(--router)}
 #s-delegate:checked~.tabbar label[for=s-delegate],
-#s-gif:checked~.tabbar label[for=s-gif]{color:var(--ink);background:var(--bright);
+#s-gif:checked~.tabbar label[for=s-gif],
+#s-svg:checked~.tabbar label[for=s-svg]{color:var(--ink);background:var(--bright);
   border-color:var(--bright);font-weight:600}
 #s-delegate:focus-visible~.tabbar label[for=s-delegate],
-#s-gif:focus-visible~.tabbar label[for=s-gif]{outline:2px solid var(--router);outline-offset:3px}
+#s-gif:focus-visible~.tabbar label[for=s-gif],
+#s-svg:focus-visible~.tabbar label[for=s-svg]{outline:2px solid var(--router);outline-offset:3px}
 .pane{display:none}
 #s-delegate:checked~.pane-delegate{display:block}
 #s-gif:checked~.pane-gif{display:block}
+#s-svg:checked~.pane-svg{display:block}
 
 .caption{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin:0 0 14px;max-width:74ch}
 .caption b{color:var(--text);font-weight:500}
@@ -173,17 +176,20 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
   <p class="lede">Agent skills for Claude Code and Codex CLI. <strong>delegate</strong> reaches other
   providers from the session you are already in, matches each task to the cheapest capable model,
   and uses plan allowances you already pay for — no moving work between IDEs or chat apps.
-  <strong>gif</strong> builds on it, turning one free image call into a small looping animation.</p>
+  <strong>gif</strong> and <strong>svg</strong> build on it, turning one free call into a small
+  looping icon — pixels or vectors.</p>
 </header>
 
 <div class="switch" id="session">
   <input type="radio" name="skill" id="s-delegate" checked>
   <input type="radio" name="skill" id="s-gif">
+  <input type="radio" name="skill" id="s-svg">
 
   <div class="tabbar">
     <span class="eyebrow">skill</span>
     <label for="s-delegate">delegate</label>
     <label for="s-gif">gif</label>
+    <label for="s-svg">svg</label>
   </div>
 
   <div class="pane pane-delegate">
@@ -325,6 +331,60 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
     </div>
   </div>
 
+  <div class="pane pane-svg">
+    <p class="caption">The same shape as <code>gif</code>, but an SVG is <b>code</b> — so it comes from
+    a delegate <em>text</em> tier, not an image model, and everything a model cannot be trusted with
+    is enforced locally. An <b>illustrative run</b>: the commands, the flags and the shape of the
+    output are real.</p>
+
+    <div class="term">
+      <div class="term-bar">
+        <b>a looping icon, a still version, and a look inside the file</b>
+        <span>3 commands · text tier · $0</span>
+      </div>
+      <div class="term-body">
+
+        <div class="step">
+          <p class="cmd"><span class="type" style="--w:50ch;--dur:900ms;--d:250ms;--n:50">svg.sh make "a ringing notification bell" bell.svg</span></p>
+          <p class="note" style="--d:1260ms">The first answer had no animation in it, so it was rejected and re-asked a tier up with the error attached. <span class="who">free · plan</span></p>
+          <p class="res">
+<span class="l" style="--d:1340ms">[svg] asking delegate (code) for the source</span>
+<span class="l" style="--d:1372ms"><span class="warn">svgpack: no animation in the SVG, and --still was not given.</span></span>
+<span class="l" style="--d:1404ms">[svg] retry 1/1 on tier 'hard'</span>
+<span class="l" style="--d:1436ms">wrote bell.svg (32x32, animated, transparent, 486 bytes)</span>
+</p>
+        </div>
+
+        <div class="step">
+          <p class="cmd"><span class="type" style="--w:48ch;--dur:900ms;--d:1700ms;--n:48">svg.sh still "a bell" bell-static.svg --size 128</span></p>
+          <p class="note" style="--d:2710ms">Pass <code>still</code> and you get one static image — animation elements, keyframes and transitions all removed, not merely paused.</p>
+          <p class="res">
+<span class="l" style="--d:2790ms">wrote bell-static.svg (128x128, still, transparent, 385 bytes)</span>
+</p>
+        </div>
+
+        <div class="step">
+          <p class="cmd"><span class="type" style="--w:21ch;--dur:588ms;--d:3050ms;--n:21">svg.sh probe bell.svg</span></p>
+          <p class="note" style="--d:3690ms">What is actually in the file. <code>probe</code> exits nonzero on anything unsafe, so it lints SVGs you did not generate too.</p>
+          <p class="res">
+<span class="l" style="--d:3770ms">size        32 x 32</span>
+<span class="l" style="--d:3802ms">viewBox     0 0 100 100</span>
+<span class="l" style="--d:3834ms">animation   1 SMIL element(s), cycle 1.000s</span>
+<span class="l" style="--d:3866ms">loop        indefinite</span>
+<span class="l" style="--d:3898ms">background  transparent</span>
+<span class="l" style="--d:3930ms">unsafe      none<span class="caret"></span></span>
+</p>
+        </div>
+
+      </div>
+      <div class="term-foot" style="--d:4130ms">
+        Every SMIL time is scaled so one cycle lasts exactly the duration you asked for — keeping the
+        stagger between elements instead of flattening it — and scripts, event handlers, external
+        references and DOCTYPEs never reach the file at all.
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <section id="install">
@@ -356,8 +416,10 @@ cd ~/code/skills
 ln -s "$PWD/delegate" ~/.claude/skills/delegate
 ln -s "$PWD/delegate" ~/.codex/skills/delegate
 ln -s "$PWD/gif" ~/.claude/skills/gif
+ln -s "$PWD/svg" ~/.claude/skills/svg
 ln -s "$PWD/delegate/scripts/delegate.sh" ~/.local/bin/
-ln -s "$PWD/gif/scripts/gif.sh" ~/.local/bin/</pre>
+ln -s "$PWD/gif/scripts/gif.sh" ~/.local/bin/
+ln -s "$PWD/svg/scripts/svg.sh" ~/.local/bin/</pre>
   </div>
 </section>
 
