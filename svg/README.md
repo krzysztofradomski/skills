@@ -1,8 +1,8 @@
 # svg
 
-Small SVG icons, for Claude Code (primary) and Codex CLI. Looping SMIL animation by default, or a
-single still image with `--still`. Square, 16/32/64/128 px, transparent or on a solid background,
-loops up to three seconds.
+Small SVG icons, for Claude Code (primary) and Codex CLI. A looping CSS animation by default, a
+single still with `--still`, or a frame-by-frame sequence with `--frames N`. Square, 16/32/64/128 px,
+transparent or on a solid background, loops up to three seconds.
 
 The sibling of [`gif`](../gif/), with one important difference: an SVG is *code*, so it comes from a
 [`delegate`](../delegate/) **text** tier rather than an image model. That means it runs on plan
@@ -39,13 +39,21 @@ Only `svg.sh` goes on your `PATH`; `svgpack.py` sits next to it and is found thr
 ## Use
 
 ```bash
-svg.sh make "a ringing notification bell" bell.svg     # 32px, transparent, 1s loop, forever
+svg.sh make "a ringing notification bell" bell.svg     # 32px, transparent, CSS, 1s, forever
 svg.sh still "a bell" bell-static.svg                  # no animation at all
-svg.sh make "a loading spinner" spin.svg --size 64 --duration 1.5
+svg.sh make "a walking robot" walk.svg --frames 6      # 6 drawings; the timing is written for you
+svg.sh make "a loading spinner" spin.svg --smil        # SMIL instead of CSS
 svg.sh build out.svg my-reply.txt --still              # normalize source you already have
 svg.sh probe out.svg                                   # also a lint: exits 1 on anything unsafe
 svg.sh preview out.svg out.png                         # rasterize frame 0 and look at it
 ```
+
+**CSS, frames or SMIL?** CSS for anything going into a web page: it can be restyled from the host
+page and it respects `prefers-reduced-motion`, which SMIL has no way to express. `--frames N` when
+the motion cannot be interpolated (a sprite gait, a dial ticking through positions) or when you want
+the frames themselves — the model draws N moments and the script writes the timing, and
+`--keep-frames` gives you each one as a still SVG, ready to rasterize and hand to `gif`. `--smil`
+when the file must animate with no chance of a host stylesheet reaching it.
 
 Or ask your agent for "a 64px transparent looping svg spinner" and let it load the skill.
 
@@ -64,8 +72,9 @@ uploads — treat it as a seatbelt, not a firewall.
 
 - **Drawing quality is the model's.** At 16–32px you want one strong shape; ornate subjects fail
   however clean the source is.
-- **SMIL only for exact timing.** If a model returns CSS `@keyframes` anyway, the loop is forced
-  infinite but the duration is not rewritten, and the run says so.
+- **Reduced motion has a hole.** The `prefers-reduced-motion` rule is honoured when the SVG is
+  inlined or opened directly, but Chromium ignores the host setting for a file loaded through
+  `<img src="icon.svg">`. Inline it if that matters.
 - **Frame-0 previews.** `preview` shows the drawing, not the motion; open the file in a browser to
   watch it.
 - Developed on Linux; the script avoids GNU-only flags and `readlink -f` so it works on macOS bash

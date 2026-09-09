@@ -34,7 +34,7 @@ read this same format from their own skill directories, so one folder serves bot
 |---|---|
 | [delegate](delegate/) | Routes work across providers without leaving your current agent, matching model strength and cost to each task. Uses Antigravity and Codex plan allowances and OpenRouter free models; also generates images. |
 | [gif](gif/) | Builds small looping animated GIFs — square 16/32/64/128 px, transparent or not, up to 3s. Generates the frames through `delegate` on plan allowance, then assembles them locally. |
-| [svg](svg/) | Builds small SVG icons — looping SMIL animation, or a single still with `--still`. Asks a `delegate` text tier for the source, then sanitizes, resizes and re-times it locally. |
+| [svg](svg/) | Builds small SVG icons — a looping CSS animation, a single still with `--still`, or a frame-by-frame sequence with `--frames N`. Asks a `delegate` text tier for the source, then sanitizes, resizes and re-times it locally. |
 
 Skills can build on each other. `gif` uses `delegate` for the one image call it needs, so its frames
 come out of a plan allowance rather than a paid image API; `svg` uses a `delegate` *text* tier

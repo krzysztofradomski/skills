@@ -23,6 +23,7 @@ pack() { "$PY" "$PACK" "$@"; }
 # Defaults.
 size=32; duration=1; loop=0; still=""; bg=""; tier="code"; style=""
 keep=""; retries=1; round=2; title=""; allow_raster=""
+smil=""; frames=0; keep_frames=""; no_reduced=""
 
 need_num() { case "$2" in ''|*[!0-9.]*) die "$1 needs a number, got '${2:-}'" ;; esac; }
 
@@ -36,6 +37,10 @@ parse_opts() {
       --retries)  need_num --retries "${2:-}"; retries="$2"; shift 2 ;;
       --round)    round="${2:-}"; [ -n "$round" ] || die "--round needs a number (-1 to disable)"; shift 2 ;;
       --still)    still=1; shift ;;
+      --smil)     smil=1; shift ;;
+      --frames)   need_num --frames "${2:-}"; frames="$2"; shift 2 ;;
+      --keep-frames) keep_frames="${2:-}"; [ -n "$keep_frames" ] || die "--keep-frames needs a directory"; shift 2 ;;
+      --no-reduced-motion) no_reduced=1; shift ;;
       --bg)       bg="${2:-}"; [ -n "$bg" ] || die "--bg needs a color"; shift 2 ;;
       --opaque)   bg="#ffffff"; shift ;;
       --tier)     tier="${2:-}"
@@ -58,6 +63,9 @@ pack_opts=()
 build_opts() {
   pack_opts=(--size "$size" --duration "$duration" --loop "$loop" --round "$round")
   [ -n "$still" ] && pack_opts+=(--still)
+  [ "$frames" -gt 0 ] && pack_opts+=(--frames "$frames")
+  [ -n "$keep_frames" ] && pack_opts+=(--keep-frames "$keep_frames")
+  [ -n "$no_reduced" ] && pack_opts+=(--no-reduced-motion)
   [ -n "$bg" ] && pack_opts+=(--bg "$bg")
   [ -n "$title" ] && pack_opts+=(--title "$title")
   [ -n "$allow_raster" ] && pack_opts+=("$allow_raster")
@@ -81,11 +89,28 @@ prompt_for() { # subject
   if [ -n "$still" ]; then
     anim="This is a STILL image: no animation at all. Do not include <animate>,
   <animateTransform>, <set>, CSS animations, transitions or @keyframes."
+  elif [ "$frames" -gt 0 ]; then
+    anim="Draw the animation as exactly $frames separate frames: $frames sibling <g> elements,
+  direct children of <svg>, in order, each one drawing the whole subject at one moment
+  of the loop. Frame $frames flows back into frame 1. Keep the subject at the same
+  position and scale in every frame; only the moving parts move. Put NO animation of
+  any kind in the file -- no <animate>, no CSS animation, no opacity tricks. The frame
+  timing is added afterwards by the tooling."
+  elif [ -n "$smil" ]; then
+    anim="Animate it with SMIL elements (<animate>, <animateTransform>) -- not CSS.
+  One loop lasts exactly ${duration}s: give each animation dur=\"${duration}s\" and
+  repeatCount=\"indefinite\". The loop is seamless: the last value of every animation
+  equals its first."
   else
-    anim="Animate it with SMIL elements (<animate>, <animateTransform>) -- not CSS
-  animations. One loop lasts exactly ${duration}s: every animation's dur must add up to
-  that one cycle, and each carries repeatCount=\"indefinite\". The loop is seamless:
-  the last value of every animation equals its first."
+    anim="Animate it with CSS, in ONE <style> element inside the <svg>, using @keyframes and
+  classes (never ids) on the shapes. One loop lasts exactly ${duration}s: animation-duration
+  is ${duration}s and the iteration count is infinite. Stagger parts with animation-delay
+  rather than with differing durations. Any element you transform needs
+  transform-box: fill-box and an explicit transform-origin, or it will rotate around the
+  wrong point. Keep colours and geometry as inline presentation attributes on the shapes
+  (fill=\"...\", stroke-width=\"...\") and put only the animation in the CSS, so the icon
+  can be restyled without touching the stylesheet. The loop is seamless: the 100% keyframe
+  matches the 0% one."
   fi
   cat <<EOF
 Write one complete SVG icon and output NOTHING but its source. No explanation
@@ -127,6 +152,7 @@ keep_raw() { [ -n "$keep" ] && [ -f "$TMP/raw.txt" ] && { cp "$TMP/raw.txt" "$ke
 
 make_svg() { # subject, out
   local subject="$1" out="$2" attempt=0 t="$tier" err="" rc=0
+  [ -n "$still" ] && [ "$frames" -gt 0 ] && die "--still and --frames are opposites; pick one"
   build_opts
   while :; do
     if generate "$subject" "$t" "$err"; then
@@ -213,7 +239,9 @@ check)
   ;;
 *) die 'usage: svg.sh make "<subject>" out.svg | still "<subject>" out.svg | build out.svg <file|->
               | probe <f.svg> | preview <f.svg> out.png | check
-       opts: --still  --size 16|32|64|128 (32)  --duration SEC (1, max 3)  --loop N (0=forever)
+       opts: --still | --frames N | --smil     (default: one CSS-animated icon)
+             --size 16|32|64|128 (32)  --duration SEC (1, max 3)  --loop N (0=forever)
              --bg COLOR | --opaque  --tier cheap|read|code|hard|or|codex (code)  --style "..."
-             --title TEXT  --keep-raw FILE  --retries N (1)  --round N (2)  --allow-raster' ;;
+             --keep-frames DIR  --no-reduced-motion  --title TEXT  --keep-raw FILE
+             --retries N (1)  --round N (2)  --allow-raster' ;;
 esac
