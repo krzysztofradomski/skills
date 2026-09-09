@@ -144,6 +144,13 @@ def has_css_animation(root):
                 or re.search(r"animation(?:-name)?\s*:\s*(?!none\b)[^;}]+", txt, re.I))
 
 
+# A whole declaration, wherever it sits in the block. Anchoring this to the start
+# of a line only stripped `animation:` when it happened to open one, which left a
+# running animation in a file that had just been declared still.
+ANIM_DECL_RE = re.compile(r"(?<![-\w])(?:animation|transition)(?:-[a-z-]+)?\s*:[^;}]*;?", re.I)
+KEYFRAMES_RE = re.compile(r"@(?:-[a-z]+-)?keyframes[^{]*\{(?:[^{}]*\{[^{}]*\}\s*)*\}", re.I)
+
+
 def strip_animation(root):
     """--still: a still must be genuinely static, not merely paused."""
     n = 0
@@ -154,14 +161,15 @@ def strip_animation(root):
             p.remove(el)
             n += 1
     for st in css_blocks(root):
-        txt = re.sub(r"@keyframes[^{]*\{(?:[^{}]*\{[^{}]*\}\s*)*\}", "", st.text, flags=re.I)
-        txt = re.sub(r"(?m)^\s*(animation|transition)[^;]*;", "", txt, flags=re.I)
+        txt = ANIM_DECL_RE.sub("", KEYFRAMES_RE.sub("", st.text))
+        if txt != st.text:
+            n += 1
         st.text = txt
-        n += 1 if txt != st.text else 0
     for el in root.iter():
-        s = el.get("style")
-        if s and re.search(r"animation|transition", s, re.I):
-            el.set("style", re.sub(r"(?:animation|transition)[^;]*;?", "", s, flags=re.I))
+        style = el.get("style")
+        if style and ANIM_DECL_RE.search(style):
+            el.set("style", ANIM_DECL_RE.sub("", style))
+            n += 1
     return n
 
 

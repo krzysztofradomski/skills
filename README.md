@@ -163,6 +163,21 @@ You do not need to invoke a skill by name. Describe what you want, and the agent
 whose description matches — "delegate this to a cheaper model" pulls in `delegate` on its own. Name
 it explicitly (`/delegate`) when you want to be certain, or when the phrasing is ambiguous.
 
+## Tests
+
+```bash
+bash tests/run.sh
+```
+
+Four suites, 162 assertions, no test framework and no provider calls: generation
+is exercised against a fake `delegate.sh` that replays canned model replies and
+records the prompts it was handed, so the retry loop and the prompt contents are
+tested without spending quota. The browser suite (Playwright) checks that the SVG
+output actually animates, holds still under `prefers-reduced-motion`, and steps
+one frame per slot; it skips cleanly when Playwright is not installed. See
+[`tests/`](tests/) for what each suite covers and for the three real bugs they
+have already caught.
+
 ## Site
 
 [`site/`](site/) is a single self-contained `index.html`: a landing page built around a real

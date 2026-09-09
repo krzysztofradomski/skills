@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 100 100">
+  <rect x="0" y="0" width="100" height="100" fill="#0b1020"/>
+  <g transform="translate(50,50)">
+    <ellipse rx="28.123456" ry="28.987654" fill="#f5c518" stroke="#a8790a" stroke-width="4.00001">
+      <animate attributeName="rx" values="28;3;28" dur="1.2s" begin="0.4s"/>
+    </ellipse>
+    <circle r="12.5" fill="#a8790a">
+      <animate attributeName="r" values="12.5;1;12.5" dur="1.2s" begin="0.4s"/>
+    </circle>
+  </g>
+</svg>
