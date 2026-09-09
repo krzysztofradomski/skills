@@ -10,7 +10,8 @@ Assembly happens locally, with no network and no ImageMagick.
 
 ## Requirements
 
-- `python3` with [Pillow](https://pypi.org/project/pillow/) (`pip install pillow`)
+- `python3` with [Pillow](https://pypi.org/project/pillow/) — `pip install pillow`, or
+  `brew install pillow` if your `python3` is Homebrew's, which refuses pip (PEP 668)
 - The [`delegate`](../delegate/) skill on your `PATH` — only to *generate* frames. Assembling frames
   or sprite sheets you already have needs nothing but Pillow.
 - `bash`. Written for bash 3.2 (macOS) as well as newer bash.

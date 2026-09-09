@@ -80,7 +80,8 @@ only reports intent.
 
 ## Dependencies
 
-`python3` and Pillow (`pip install pillow`) for everything; `delegate.sh` on `PATH` only for
+`python3` and Pillow (`pip install pillow`, or `brew install pillow` on a Homebrew
+python, which refuses pip under PEP 668) for everything; `delegate.sh` on `PATH` only for
 generation. No ImageMagick, no ffmpeg, no network. `$PYTHON` overrides the interpreter.
 `gifpack.py` is usable on its own (`python3 gifpack.py build|slice|probe --help`) if you want the pipeline
 without the prompting.

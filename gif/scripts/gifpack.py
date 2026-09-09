@@ -15,7 +15,7 @@ import sys
 try:
     from PIL import Image
 except ImportError:
-    sys.exit("gifpack: Pillow is required -- pip install pillow")
+    sys.exit("gifpack: Pillow is required -- pip install pillow, or brew install pillow on Homebrew python")
 
 SIZES = (16, 32, 64, 128)
 MAX_DURATION = 3.0

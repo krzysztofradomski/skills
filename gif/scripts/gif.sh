@@ -105,6 +105,9 @@ EOF
 generate() { # subject -> prints frame paths, one per line, into $TMP/frames
   [ -x "$DELEGATE" ] || die "delegate.sh not found on PATH -- install the delegate skill first
       (https://github.com/krzysztofradomski/skills), or generate frames yourself and use 'gif.sh frames'"
+  # Pillow does every pixel of the assembly, so check for it before an image call is spent
+  # generating frames nothing can turn into a GIF.
+  "$PY" -c 'import PIL' 2>/dev/null || die "Pillow is required -- pip install pillow, or brew install pillow on Homebrew python"
   mkdir -p "$TMP/frames"
   if [ -n "$per_frame" ]; then
     local i=1
@@ -190,7 +193,7 @@ check)
   if "$PY" -c 'import PIL; print(PIL.__version__)' >/dev/null 2>&1; then
     printf 'pillow       %s\n' "$("$PY" -c 'import PIL; print(PIL.__version__)')"
   else
-    printf 'pillow       MISSING  (pip install pillow)\n'
+    printf 'pillow       MISSING  (pip install pillow, or brew install pillow on Homebrew python)\n'
   fi
   printf 'gifpack.py   %s\n' "$PACK"
   if [ -x "$DELEGATE" ]; then printf 'delegate.sh  %s\n' "$DELEGATE"
