@@ -88,7 +88,8 @@ h1 em{font-style:normal;color:var(--claude)}
 .res{color:var(--text);margin:0 0 4px 18px}
 .preview{display:flex;align-items:center;gap:14px;margin:9px 0 4px 18px;
   animation:appear .18s var(--d) ease backwards}
-.preview img{image-rendering:pixelated;background:
+.preview img{image-rendering:pixelated}
+.preview img,.preview svg{background:
   repeating-conic-gradient(#1a2038 0 25%,#151a2e 0 50%) 0 0/12px 12px;border-radius:4px}
 .preview span{font-size:12px;color:var(--dim)}
 .add{color:var(--codex)}
@@ -365,16 +366,397 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
           <p class="note" style="--d:1260ms">CSS by default: restyleable from the page that embeds it, and it can honour <code>prefers-reduced-motion</code> — which SMIL cannot express at all. <span class="who">free · plan</span></p>
           <p class="res">
 <span class="l" style="--d:1340ms">[svg] asking delegate (code) for the source</span>
-<span class="l" style="--d:1372ms">wrote bell.svg (32x32, animated (CSS), transparent, 564 bytes)</span>
+<span class="l" style="--d:1372ms">wrote bell.svg (32x32, animated (CSS), transparent, 2423 bytes)</span>
 </p>
+          <p class="preview" style="--d:1430ms">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <style>
+    .bell {
+      animation: ring 1s infinite;
+      transform-box: fill-box;
+      transform-origin: 50% 0%;
+    }
+    .wave-l {
+      animation: wavein-l 1s infinite;
+      transform-box: fill-box;
+      transform-origin: 100% 50%;
+    }
+    .wave-r {
+      animation: wavein-r 1s infinite;
+      transform-box: fill-box;
+      transform-origin: 0% 50%;
+    }
+    @keyframes ring {
+      0%   { transform: rotate(0deg); }
+      10%  { transform: rotate(-18deg); }
+      30%  { transform: rotate(18deg); }
+      50%  { transform: rotate(-12deg); }
+      70%  { transform: rotate(12deg); }
+      85%  { transform: rotate(-4deg); }
+      95%  { transform: rotate(4deg); }
+      100% { transform: rotate(0deg); }
+    }
+    @keyframes wavein-l {
+      0%   { opacity: 0; transform: scaleX(0.4); }
+      10%  { opacity: 0; }
+      30%  { opacity: 1; transform: scaleX(1); }
+      55%  { opacity: 1; transform: scaleX(1); }
+      75%  { opacity: 0; transform: scaleX(0.4); }
+      100% { opacity: 0; transform: scaleX(0.4); }
+    }
+    @keyframes wavein-r {
+      0%   { opacity: 0; transform: scaleX(0.4); }
+      10%  { opacity: 0; }
+      30%  { opacity: 1; transform: scaleX(1); }
+      55%  { opacity: 1; transform: scaleX(1); }
+      75%  { opacity: 0; transform: scaleX(0.4); }
+      100% { opacity: 0; transform: scaleX(0.4); }
+    }
+  
+* { animation-iteration-count: infinite; }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+
+  
+  <path class="wave-l" d="M28,22 Q10,38 10,55 Q10,72 28,85" fill="none" stroke="#F59E0B" stroke-width="5.5" stroke-linecap="round" />
+
+  
+  <path class="wave-r" d="M72,22 Q90,38 90,55 Q90,72 72,85" fill="none" stroke="#F59E0B" stroke-width="5.5" stroke-linecap="round" />
+
+  
+  <g class="bell">
+    
+    <path d="M50,12 C50,12 47,14 45,20 C40,28 36,34 30,42 C26,48 24,54 24,60 L76,60 C76,54 74,48 70,42 C64,34 60,28 55,20 C53,14 50,12 50,12 Z" fill="#FBBF24" stroke="#D97706" stroke-width="2" stroke-linejoin="round" />
+    
+    <rect x="20" y="59" width="60" height="8" rx="4" fill="#D97706" />
+    
+    <circle cx="50" cy="74" r="7" fill="#92400E" stroke="#78350F" stroke-width="1.5" />
+    
+    <rect x="46" y="6" width="8" height="8" rx="4" fill="#D97706" />
+  </g>
+</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="96" height="96" preserveAspectRatio="xMidYMid meet">
+  <path class="wave-l" d="M28,22 Q10,38 10,55 Q10,72 28,85" fill="none" stroke="#F59E0B" stroke-width="5.5" stroke-linecap="round" />
+
+  
+  <path class="wave-r" d="M72,22 Q90,38 90,55 Q90,72 72,85" fill="none" stroke="#F59E0B" stroke-width="5.5" stroke-linecap="round" />
+
+  
+  <g class="bell">
+    
+    <path d="M50,12 C50,12 47,14 45,20 C40,28 36,34 30,42 C26,48 24,54 24,60 L76,60 C76,54 74,48 70,42 C64,34 60,28 55,20 C53,14 50,12 50,12 Z" fill="#FBBF24" stroke="#D97706" stroke-width="2" stroke-linejoin="round" />
+    
+    <rect x="20" y="59" width="60" height="8" rx="4" fill="#D97706" />
+    
+    <circle cx="50" cy="74" r="7" fill="#92400E" stroke="#78350F" stroke-width="1.5" />
+    
+    <rect x="46" y="6" width="8" height="8" rx="4" fill="#D97706" />
+  </g>
+</svg>
+            <span>bell.svg itself, inline in this page &#8212; 32&#215;32 and at 3&#215;. The CSS travels with the file, so it rocks here, and it holds still if your system asks for reduced motion.</span>
+          </p>
         </div>
 
         <div class="step">
           <p class="cmd"><span class="type" style="--w:49ch;--dur:900ms;--d:1640ms;--n:49">svg.sh make "a walking robot" walk.svg --frames 6</span></p>
           <p class="note" style="--d:2650ms">For motion no tween can express. The model draws six moments and nothing else; the step-end keyframes and the negative per-frame delays are written here, because that is arithmetic a model gets wrong and drawing is not.</p>
           <p class="res">
-<span class="l" style="--d:2730ms">wrote walk.svg (32x32, 6-frame sequence, transparent, 1066 bytes)</span>
+<span class="l" style="--d:2730ms">wrote walk.svg (32x32, 6-frame sequence, transparent, 11816 bytes)</span>
 </p>
+          <p class="preview" style="--d:2790ms">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+<style>
+.spk-frame { opacity: 0; animation: spk-frame-cycle 1s step-end infinite; }
+@keyframes spk-frame-cycle { 0% { opacity: 1 } 16.6667% { opacity: 0 } }
+.spk-frame-1 { animation-delay: -0.1667s; }
+.spk-frame-2 { animation-delay: -0.3333s; }
+.spk-frame-3 { animation-delay: -0.5s; }
+.spk-frame-4 { animation-delay: -0.6667s; }
+.spk-frame-5 { animation-delay: -0.8333s; }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } .spk-frame { opacity: 0 } .spk-frame-0 { opacity: 1 } }
+</style><g class="spk-frame spk-frame-0">
+  <rect x="35" y="8" width="30" height="22" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="41" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="52" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="43" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="54" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="45" y="30" width="10" height="6" fill="#3a7abf" />
+  <rect x="28" y="36" width="44" height="28" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="38" y="42" width="24" height="14" rx="2" fill="#2c5f8a" />
+  <rect x="42" y="45" width="6" height="5" rx="1" fill="#7ec8f0" />
+  <rect x="52" y="45" width="6" height="5" rx="1" fill="#f0c040" />
+  <rect x="14" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="10" y="45" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="74" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="80" y="45" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="30" y="64" width="40" height="8" rx="3" fill="#3a7abf" />
+  <rect x="32" y="72" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="33" y="86" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="29" y="94" width="18" height="5" rx="2" fill="#2c5f8a" />
+  <rect x="54" y="72" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="55" y="86" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="53" y="94" width="18" height="5" rx="2" fill="#2c5f8a" />
+</g>
+<g class="spk-frame spk-frame-1">
+  <rect x="35" y="8" width="30" height="22" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="41" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="52" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="43" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="54" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="45" y="30" width="10" height="6" fill="#3a7abf" />
+  <rect x="28" y="36" width="44" height="28" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="38" y="42" width="24" height="14" rx="2" fill="#2c5f8a" />
+  <rect x="42" y="45" width="6" height="5" rx="1" fill="#7ec8f0" />
+  <rect x="52" y="45" width="6" height="5" rx="1" fill="#f0c040" />
+  <rect x="14" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="8" y="43" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="74" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="82" y="43" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="30" y="64" width="40" height="8" rx="3" fill="#3a7abf" />
+  <rect x="30" y="70" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(-15 37 72)" />
+  <rect x="28" y="83" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="24" y="91" width="18" height="5" rx="2" fill="#2c5f8a" />
+  <rect x="56" y="70" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(15 63 72)" />
+  <rect x="59" y="83" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="57" y="91" width="18" height="5" rx="2" fill="#2c5f8a" />
+</g>
+<g class="spk-frame spk-frame-2">
+  <rect x="35" y="8" width="30" height="22" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="41" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="52" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="43" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="54" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="45" y="30" width="10" height="6" fill="#3a7abf" />
+  <rect x="28" y="36" width="44" height="28" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="38" y="42" width="24" height="14" rx="2" fill="#2c5f8a" />
+  <rect x="42" y="45" width="6" height="5" rx="1" fill="#7ec8f0" />
+  <rect x="52" y="45" width="6" height="5" rx="1" fill="#f0c040" />
+  <rect x="14" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="9" y="44" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="74" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="81" y="44" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="30" y="64" width="40" height="8" rx="3" fill="#3a7abf" />
+  <rect x="32" y="72" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="33" y="86" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="29" y="94" width="18" height="5" rx="2" fill="#2c5f8a" />
+  <rect x="54" y="70" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(-20 61 72)" />
+  <rect x="62" y="82" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" transform="rotate(25 68 82)" />
+  <rect x="64" y="89" width="14" height="5" rx="2" fill="#2c5f8a" />
+</g>
+<g class="spk-frame spk-frame-3">
+  <rect x="35" y="8" width="30" height="22" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="41" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="52" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="43" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="54" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="45" y="30" width="10" height="6" fill="#3a7abf" />
+  <rect x="28" y="36" width="44" height="28" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="38" y="42" width="24" height="14" rx="2" fill="#2c5f8a" />
+  <rect x="42" y="45" width="6" height="5" rx="1" fill="#7ec8f0" />
+  <rect x="52" y="45" width="6" height="5" rx="1" fill="#f0c040" />
+  <rect x="14" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="12" y="43" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="74" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="78" y="43" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="30" y="64" width="40" height="8" rx="3" fill="#3a7abf" />
+  <rect x="32" y="70" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(15 39 72)" />
+  <rect x="35" y="83" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="33" y="91" width="18" height="5" rx="2" fill="#2c5f8a" />
+  <rect x="54" y="70" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(-15 61 72)" />
+  <rect x="52" y="83" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="50" y="91" width="18" height="5" rx="2" fill="#2c5f8a" />
+</g>
+<g class="spk-frame spk-frame-4">
+  <rect x="35" y="8" width="30" height="22" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="41" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="52" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="43" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="54" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="45" y="30" width="10" height="6" fill="#3a7abf" />
+  <rect x="28" y="36" width="44" height="28" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="38" y="42" width="24" height="14" rx="2" fill="#2c5f8a" />
+  <rect x="42" y="45" width="6" height="5" rx="1" fill="#7ec8f0" />
+  <rect x="52" y="45" width="6" height="5" rx="1" fill="#f0c040" />
+  <rect x="14" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="11" y="44" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="74" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="79" y="44" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="30" y="64" width="40" height="8" rx="3" fill="#3a7abf" />
+  <rect x="32" y="70" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(-20 39 72)" />
+  <rect x="24" y="82" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" transform="rotate(25 30 82)" />
+  <rect x="20" y="89" width="14" height="5" rx="2" fill="#2c5f8a" />
+  <rect x="54" y="72" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="55" y="86" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="53" y="94" width="18" height="5" rx="2" fill="#2c5f8a" />
+</g>
+<g class="spk-frame spk-frame-5">
+  <rect x="35" y="8" width="30" height="22" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="41" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="52" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="43" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="54" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="45" y="30" width="10" height="6" fill="#3a7abf" />
+  <rect x="28" y="36" width="44" height="28" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="38" y="42" width="24" height="14" rx="2" fill="#2c5f8a" />
+  <rect x="42" y="45" width="6" height="5" rx="1" fill="#7ec8f0" />
+  <rect x="52" y="45" width="6" height="5" rx="1" fill="#f0c040" />
+  <rect x="14" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="10" y="44" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="74" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="80" y="44" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="30" y="64" width="40" height="8" rx="3" fill="#3a7abf" />
+  <rect x="32" y="72" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(8 39 74)" />
+  <rect x="34" y="85" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="30" y="93" width="18" height="5" rx="2" fill="#2c5f8a" />
+  <rect x="54" y="72" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(-8 61 74)" />
+  <rect x="54" y="85" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="52" y="93" width="18" height="5" rx="2" fill="#2c5f8a" />
+</g>
+</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="96" height="96" preserveAspectRatio="xMidYMid meet">
+<g class="spk-frame spk-frame-0">
+  <rect x="35" y="8" width="30" height="22" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="41" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="52" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="43" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="54" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="45" y="30" width="10" height="6" fill="#3a7abf" />
+  <rect x="28" y="36" width="44" height="28" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="38" y="42" width="24" height="14" rx="2" fill="#2c5f8a" />
+  <rect x="42" y="45" width="6" height="5" rx="1" fill="#7ec8f0" />
+  <rect x="52" y="45" width="6" height="5" rx="1" fill="#f0c040" />
+  <rect x="14" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="10" y="45" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="74" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="80" y="45" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="30" y="64" width="40" height="8" rx="3" fill="#3a7abf" />
+  <rect x="32" y="72" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="33" y="86" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="29" y="94" width="18" height="5" rx="2" fill="#2c5f8a" />
+  <rect x="54" y="72" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="55" y="86" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="53" y="94" width="18" height="5" rx="2" fill="#2c5f8a" />
+</g>
+<g class="spk-frame spk-frame-1">
+  <rect x="35" y="8" width="30" height="22" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="41" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="52" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="43" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="54" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="45" y="30" width="10" height="6" fill="#3a7abf" />
+  <rect x="28" y="36" width="44" height="28" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="38" y="42" width="24" height="14" rx="2" fill="#2c5f8a" />
+  <rect x="42" y="45" width="6" height="5" rx="1" fill="#7ec8f0" />
+  <rect x="52" y="45" width="6" height="5" rx="1" fill="#f0c040" />
+  <rect x="14" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="8" y="43" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="74" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="82" y="43" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="30" y="64" width="40" height="8" rx="3" fill="#3a7abf" />
+  <rect x="30" y="70" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(-15 37 72)" />
+  <rect x="28" y="83" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="24" y="91" width="18" height="5" rx="2" fill="#2c5f8a" />
+  <rect x="56" y="70" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(15 63 72)" />
+  <rect x="59" y="83" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="57" y="91" width="18" height="5" rx="2" fill="#2c5f8a" />
+</g>
+<g class="spk-frame spk-frame-2">
+  <rect x="35" y="8" width="30" height="22" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="41" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="52" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="43" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="54" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="45" y="30" width="10" height="6" fill="#3a7abf" />
+  <rect x="28" y="36" width="44" height="28" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="38" y="42" width="24" height="14" rx="2" fill="#2c5f8a" />
+  <rect x="42" y="45" width="6" height="5" rx="1" fill="#7ec8f0" />
+  <rect x="52" y="45" width="6" height="5" rx="1" fill="#f0c040" />
+  <rect x="14" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="9" y="44" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="74" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="81" y="44" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="30" y="64" width="40" height="8" rx="3" fill="#3a7abf" />
+  <rect x="32" y="72" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="33" y="86" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="29" y="94" width="18" height="5" rx="2" fill="#2c5f8a" />
+  <rect x="54" y="70" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(-20 61 72)" />
+  <rect x="62" y="82" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" transform="rotate(25 68 82)" />
+  <rect x="64" y="89" width="14" height="5" rx="2" fill="#2c5f8a" />
+</g>
+<g class="spk-frame spk-frame-3">
+  <rect x="35" y="8" width="30" height="22" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="41" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="52" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="43" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="54" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="45" y="30" width="10" height="6" fill="#3a7abf" />
+  <rect x="28" y="36" width="44" height="28" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="38" y="42" width="24" height="14" rx="2" fill="#2c5f8a" />
+  <rect x="42" y="45" width="6" height="5" rx="1" fill="#7ec8f0" />
+  <rect x="52" y="45" width="6" height="5" rx="1" fill="#f0c040" />
+  <rect x="14" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="12" y="43" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="74" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="78" y="43" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="30" y="64" width="40" height="8" rx="3" fill="#3a7abf" />
+  <rect x="32" y="70" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(15 39 72)" />
+  <rect x="35" y="83" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="33" y="91" width="18" height="5" rx="2" fill="#2c5f8a" />
+  <rect x="54" y="70" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(-15 61 72)" />
+  <rect x="52" y="83" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="50" y="91" width="18" height="5" rx="2" fill="#2c5f8a" />
+</g>
+<g class="spk-frame spk-frame-4">
+  <rect x="35" y="8" width="30" height="22" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="41" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="52" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="43" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="54" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="45" y="30" width="10" height="6" fill="#3a7abf" />
+  <rect x="28" y="36" width="44" height="28" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="38" y="42" width="24" height="14" rx="2" fill="#2c5f8a" />
+  <rect x="42" y="45" width="6" height="5" rx="1" fill="#7ec8f0" />
+  <rect x="52" y="45" width="6" height="5" rx="1" fill="#f0c040" />
+  <rect x="14" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="11" y="44" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="74" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="79" y="44" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="30" y="64" width="40" height="8" rx="3" fill="#3a7abf" />
+  <rect x="32" y="70" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(-20 39 72)" />
+  <rect x="24" y="82" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" transform="rotate(25 30 82)" />
+  <rect x="20" y="89" width="14" height="5" rx="2" fill="#2c5f8a" />
+  <rect x="54" y="72" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="55" y="86" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="53" y="94" width="18" height="5" rx="2" fill="#2c5f8a" />
+</g>
+<g class="spk-frame spk-frame-5">
+  <rect x="35" y="8" width="30" height="22" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="41" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="52" y="14" width="7" height="7" rx="1" fill="#fff" />
+  <rect x="43" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="54" y="16" width="3" height="3" fill="#1a3a5c" />
+  <rect x="45" y="30" width="10" height="6" fill="#3a7abf" />
+  <rect x="28" y="36" width="44" height="28" rx="4" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2.5" />
+  <rect x="38" y="42" width="24" height="14" rx="2" fill="#2c5f8a" />
+  <rect x="42" y="45" width="6" height="5" rx="1" fill="#7ec8f0" />
+  <rect x="52" y="45" width="6" height="5" rx="1" fill="#f0c040" />
+  <rect x="14" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="10" y="44" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="74" y="37" width="12" height="8" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="80" y="44" width="10" height="16" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="30" y="64" width="40" height="8" rx="3" fill="#3a7abf" />
+  <rect x="32" y="72" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(8 39 74)" />
+  <rect x="34" y="85" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="30" y="93" width="18" height="5" rx="2" fill="#2c5f8a" />
+  <rect x="54" y="72" width="14" height="14" rx="3" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2" transform="rotate(-8 61 74)" />
+  <rect x="54" y="85" width="12" height="10" rx="3" fill="#3a7abf" stroke="#2c5f8a" stroke-width="2" />
+  <rect x="52" y="93" width="18" height="5" rx="2" fill="#2c5f8a" />
+</g>
+</svg>
+            <span>walk.svg &#8212; six drawn moments, no tween. Step-end keyframes hold each one for a sixth of the second.</span>
+          </p>
         </div>
 
         <div class="step">
