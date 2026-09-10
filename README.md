@@ -7,9 +7,7 @@
 Agent skills for [Claude Code](https://claude.com/claude-code) and
 [Codex CLI](https://developers.openai.com/codex/cli).
 
-<video src="gif-cat-4x.mp4" controls muted loop width="600">
-  `gif` generating a dancing cat GIF end to end, sped up 4x.
-</video>
+![`gif` generating a dancing cat GIF end to end, sped up 4x](gif-cat-4x.gif)
 
 The skills run from the agent you are already using. `delegate` reaches across provider boundaries
 from that one session: stay in Claude Code while handing work to Antigravity or Codex, or stay in
