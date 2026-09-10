@@ -16,7 +16,7 @@ for a in "$@"; do
     *) want+=("$a") ;;
   esac
 done
-[ ${#want[@]} -gt 0 ] || want=(svg gif install render)
+[ ${#want[@]} -gt 0 ] || want=(delegate svg gif install render)
 
 failed=(); ran=0
 for suite in "${want[@]}"; do
@@ -27,13 +27,13 @@ for suite in "${want[@]}"; do
       ran=$((ran + 1))
       "$PY" "$HERE/test_render.py" || failed+=(render)
       ;;
-    svg|gif|install)
+    delegate|svg|gif|install)
       [ -f "$HERE/test_$suite.sh" ] || { echo "no suite: $suite" >&2; exit 2; }
       printf '\n\033[1m== %s\033[0m\n' "$suite"
       ran=$((ran + 1))
       bash "$HERE/test_$suite.sh" || failed+=("$suite")
       ;;
-    *) echo "run.sh: no such suite: $suite (svg gif install render)" >&2; exit 2 ;;
+    *) echo "run.sh: no such suite: $suite (delegate svg gif install render)" >&2; exit 2 ;;
   esac
 done
 

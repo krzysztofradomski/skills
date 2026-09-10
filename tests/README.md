@@ -1,8 +1,8 @@
 # tests
 
-162 assertions across four suites. No test framework, no network, no provider
-calls, no money: [`lib.sh`](lib.sh) is forty lines of shell and the delegate is
-faked.
+224 assertions across five suites. No test framework, no network, no provider
+calls, no money: [`lib.sh`](lib.sh) is forty lines of shell, and every provider
+-- delegate itself, and the agy/codex/openrouter it talks to -- is faked.
 
 ```bash
 bash tests/run.sh                 # everything available
@@ -12,6 +12,7 @@ bash tests/run.sh --no-render     # skip the browser suite
 
 | Suite | Needs | Covers |
 |---|---|---|
+| [`test_delegate.sh`](test_delegate.sh) | `jq` | provider detection, tier routing, the write-verification guard and its retry, skill application, openrouter's free-model fallback, free-before-paid images |
 | [`test_svg.sh`](test_svg.sh) | `python3` | extraction, the sanitizer, geometry, retiming, frame sequences, generation and the retry loop |
 | [`test_gif.sh`](test_gif.sh) | `python3` + Pillow | sizes, matte keying, delay quantization, looping, sheet slicing, generation |
 | [`test_install.sh`](test_install.sh) | a git clone | linking, subsets, idempotency, refusing to clobber |

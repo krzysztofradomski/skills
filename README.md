@@ -182,14 +182,16 @@ it explicitly (`/delegate`) when you want to be certain, or when the phrasing is
 bash tests/run.sh
 ```
 
-Four suites, 162 assertions, no test framework and no provider calls: generation
-is exercised against a fake `delegate.sh` that replays canned model replies and
-records the prompts it was handed, so the retry loop and the prompt contents are
-tested without spending quota. The browser suite (Playwright) checks that the SVG
-output actually animates, holds still under `prefers-reduced-motion`, and steps
-one frame per slot; it skips cleanly when Playwright is not installed. See
-[`tests/`](tests/) for what each suite covers and for the three real bugs they
-have already caught.
+Five suites, 224 assertions, no test framework and no provider calls: delegate's
+own tests fake agy, codex and openrouter to check provider detection, tier
+routing, the write-verification guard, and the free-before-paid image order.
+Generation for the gif/svg skills is exercised against a fake `delegate.sh` that
+replays canned model replies and records the prompts it was handed, so the retry
+loop and the prompt contents are tested without spending quota. The browser suite
+(Playwright) checks that the SVG output actually animates, holds still under
+`prefers-reduced-motion`, and steps one frame per slot; it skips cleanly when
+Playwright is not installed. See [`tests/`](tests/) for what each suite covers
+and for the three real bugs they have already caught.
 
 ## Site
 
