@@ -1,0 +1,31 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # macOS is where these skills are actually used, and it ships bash 3.2 --
+        # which is the whole reason the scripts avoid readlink -f and mapfile.
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pillow playwright
+          python -m playwright install chromium   # --with-deps is Linux-only; runners already have them
+      - name: Run the suite
+        run: bash tests/run.sh
+      - name: Shell syntax
+        run: for f in install.sh */scripts/*.sh tests/*.sh; do bash -n "$f"; done

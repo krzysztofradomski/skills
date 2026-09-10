@@ -33,6 +33,13 @@ read this same format from their own skill directories, so one folder serves bot
 | Skill | What it does |
 |---|---|
 | [delegate](delegate/) | Routes work across providers without leaving your current agent, matching model strength and cost to each task. Uses Antigravity and Codex plan allowances and OpenRouter free models; also generates images. |
+| [gif](gif/) | Builds small looping animated GIFs — square 16/32/64/128 px, transparent or not, up to 3s. Generates the frames through `delegate` on plan allowance, then assembles them locally. |
+| [svg](svg/) | Builds small SVG icons — a looping CSS animation, a single still with `--still`, or a frame-by-frame sequence with `--frames N`. Asks a `delegate` text tier for the source, then sanitizes, resizes and re-times it locally. |
+
+Skills can build on each other. `gif` uses `delegate` for the one image call it needs, so its frames
+come out of a plan allowance rather than a paid image API; `svg` uses a `delegate` *text* tier
+instead, because an SVG is code rather than pixels. Install `delegate` alongside either to use them
+end to end — working on frames or source you already have needs only the skill itself.
 
 ## Install
 
@@ -78,6 +85,8 @@ cd ~/code/skills
 mkdir -p ~/.claude/skills ~/.codex/skills
 ln -s "$PWD/delegate" ~/.claude/skills/delegate    # Claude Code
 ln -s "$PWD/delegate" ~/.codex/skills/delegate     # Codex CLI
+ln -s "$PWD/gif" ~/.claude/skills/gif              # and the same for any other skill
+ln -s "$PWD/svg" ~/.claude/skills/svg
 ```
 
 Clone anywhere you like — `$PWD` keeps the commands correct whatever path you chose. Install only
@@ -89,6 +98,8 @@ Some skills ship a script. Put it on your `PATH` so both you and the agent can r
 ```bash
 mkdir -p ~/.local/bin
 ln -s "$PWD/delegate/scripts/delegate.sh" ~/.local/bin/delegate.sh
+ln -s "$PWD/gif/scripts/gif.sh" ~/.local/bin/gif.sh
+ln -s "$PWD/svg/scripts/svg.sh" ~/.local/bin/svg.sh
 ```
 
 If `~/.local/bin` is not already on your `PATH`, add it to your shell profile:
@@ -151,6 +162,21 @@ existing proves nothing.
 You do not need to invoke a skill by name. Describe what you want, and the agent loads the skill
 whose description matches — "delegate this to a cheaper model" pulls in `delegate` on its own. Name
 it explicitly (`/delegate`) when you want to be certain, or when the phrasing is ambiguous.
+
+## Tests
+
+```bash
+bash tests/run.sh
+```
+
+Four suites, 162 assertions, no test framework and no provider calls: generation
+is exercised against a fake `delegate.sh` that replays canned model replies and
+records the prompts it was handed, so the retry loop and the prompt contents are
+tested without spending quota. The browser suite (Playwright) checks that the SVG
+output actually animates, holds still under `prefers-reduced-motion`, and steps
+one frame per slot; it skips cleanly when Playwright is not installed. See
+[`tests/`](tests/) for what each suite covers and for the three real bugs they
+have already caught.
 
 ## Site
 

@@ -1,0 +1,17 @@
+Sure! Here's the icon you asked for:
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <style>
+    .b { fill:#a78bfa; animation: bounce 1.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center }
+    .b2 { animation-delay: 0.2s }
+    .b3 { animation-delay: 0.4s }
+    @keyframes bounce { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-18px) } }
+  </style>
+  <circle class="b" cx="24" cy="60" r="10"/>
+  <circle class="b b2" cx="50" cy="60" r="10"/>
+  <circle class="b b3" cx="76" cy="60" r="10"/>
+</svg>
+```
+
+Let me know if you want a different palette!

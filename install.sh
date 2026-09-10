@@ -24,7 +24,10 @@ else
 fi
 
 # A skill is any directory holding a SKILL.md.
-available() { for d in "$DEST"/*/; do [ -f "$d/SKILL.md" ] && basename "$d"; done; }
+# `return 0`: without it the last directory lacking a SKILL.md (site/) makes this
+# return 1, the `&& printf` below never runs, and the read that needs its NUL
+# fails the whole script under `set -e`.
+available() { for d in "$DEST"/*/; do [ -f "$d/SKILL.md" ] && basename "$d"; done; return 0; }
 wanted=("$@"); [ ${#wanted[@]} -gt 0 ] || IFS=$'\n' read -r -d '' -a wanted < <(available && printf '\0')
 
 # Never clobber a real directory: only replace a symlink we already own.

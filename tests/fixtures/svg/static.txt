@@ -1,0 +1,2 @@
+Here you go — a clean bell icon:
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 20 C62 20 70 30 70 45 L70 62 L78 72 L22 72 L30 62 L30 45 C30 30 38 20 50 20 Z" fill="#f59e0b"/><circle cx="50" cy="78" r="7" fill="#f59e0b"/></svg>

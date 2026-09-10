@@ -56,11 +56,17 @@ h1 em{font-style:normal;color:var(--claude)}
 .tabbar label{color:var(--dim);border:1px solid var(--line);border-radius:99px;
   padding:6px 14px;cursor:pointer;background:var(--panel)}
 .tabbar label:hover{color:var(--bright);border-color:var(--router)}
-#s-delegate:checked~.tabbar label[for=s-delegate]{color:var(--ink);background:var(--bright);
+#s-delegate:checked~.tabbar label[for=s-delegate],
+#s-gif:checked~.tabbar label[for=s-gif],
+#s-svg:checked~.tabbar label[for=s-svg]{color:var(--ink);background:var(--bright);
   border-color:var(--bright);font-weight:600}
-#s-delegate:focus-visible~.tabbar label[for=s-delegate]{outline:2px solid var(--router);outline-offset:3px}
+#s-delegate:focus-visible~.tabbar label[for=s-delegate],
+#s-gif:focus-visible~.tabbar label[for=s-gif],
+#s-svg:focus-visible~.tabbar label[for=s-svg]{outline:2px solid var(--router);outline-offset:3px}
 .pane{display:none}
 #s-delegate:checked~.pane-delegate{display:block}
+#s-gif:checked~.pane-gif{display:block}
+#s-svg:checked~.pane-svg{display:block}
 
 .caption{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin:0 0 14px;max-width:74ch}
 .caption b{color:var(--text);font-weight:500}
@@ -80,9 +86,18 @@ h1 em{font-style:normal;color:var(--claude)}
 .cmd::before{content:"\276F";color:var(--router);flex:none;font-weight:600}
 .note{color:var(--dim);margin:3px 0 10px 18px;font-size:12.5px;line-height:1.6}
 .res{color:var(--text);margin:0 0 4px 18px}
+.preview{display:flex;align-items:center;gap:14px;margin:9px 0 4px 18px;
+  animation:appear .18s var(--d) ease backwards}
+.preview img{image-rendering:pixelated}
+.preview img,.preview svg{background:
+  repeating-conic-gradient(#1a2038 0 25%,#151a2e 0 50%) 0 0/12px 12px;border-radius:4px}
+.preview span{font-size:12px;color:var(--dim)}
+.preview b{display:block;color:var(--paid);font-weight:500}   /* these are files, not terminal output */
 .add{color:var(--codex)}
 .warn{color:var(--paid)}
 .flag{color:var(--claude)}
+/* gif and svg print the written path as an OSC 8 hyperlink, which a terminal underlines. */
+.path{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
 .who{font-family:var(--mono);font-size:11.5px;padding:2px 8px;border-radius:99px;
   border:1px solid;white-space:nowrap;color:var(--codex);border-color:#265c4b;background:#10241d}
 .term-foot{padding:13px 16px 16px;border-top:1px solid #202744;
@@ -144,6 +159,10 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
   .res,.note{margin-left:0}
   .rail .wrap{font-size:11.5px;gap:13px}
 }
+/* A tab you come back to would replay from an empty terminal: display:none cancels the animations,
+   so a re-shown pane starts over. Once a transcript has run, it stays run. */
+.pane.done .step>*,.pane.done .cmd .type,.pane.done .res .l,.pane.done .term-foot{animation:none}
+
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .step>*,.cmd .type,.res .l,.term-foot{animation:none}
@@ -169,21 +188,28 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
   <h1>Use the <em>right provider</em>. Stay in one place.</h1>
   <p class="lede">Agent skills for Claude Code and Codex CLI. <strong>delegate</strong> reaches other
   providers from the session you are already in, matches each task to the cheapest capable model,
-  and uses plan allowances you already pay for — no moving work between IDEs or chat apps.</p>
+  and uses plan allowances you already pay for — no moving work between IDEs or chat apps.
+  <strong>gif</strong> and <strong>svg</strong> build on it, turning one free call into a small
+  looping icon — pixels or vectors.</p>
 </header>
 
 <div class="switch" id="session">
   <input type="radio" name="skill" id="s-delegate" checked>
+  <input type="radio" name="skill" id="s-gif">
+  <input type="radio" name="skill" id="s-svg">
 
   <div class="tabbar">
     <span class="eyebrow">skill</span>
     <label for="s-delegate">delegate</label>
+    <label for="s-gif">gif</label>
+    <label for="s-svg">svg</label>
   </div>
 
   <div class="pane pane-delegate">
     <p class="caption">A <b>prepared demo</b>, not a screen recording of production work: a throwaway
     repo with one deliberately unvalidated function, so the flow fits on a page. The commands, the
-    models and every line of output are real and unedited — only the file paths are shortened.</p>
+    models and every line of output are real — only the file paths and the wording of one prompt are
+    shortened to fit the width.</p>
 
     <div class="term">
       <div class="term-bar">
@@ -216,7 +242,7 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
         </div>
 
         <div class="step">
-          <p class="cmd"><span class="type" style="--w:137ch;--dur:900ms;--d:2746ms;--n:137">delegate.sh code "applyDiscount does not validate percent. Add a guard that throws a RangeError when it is below 0 or above 100." --write</span></p>
+          <p class="cmd"><span class="type" style="--w:94ch;--dur:900ms;--d:2746ms;--n:94">delegate.sh code "applyDiscount: throw a RangeError when percent is outside [0, 100]." --write</span></p>
           <p class="note" style="--d:3756ms">A bounded change you could hand a competent stranger, so Claude Sonnet writes it. <span class="who">free · plan</span></p>
           <p class="res">
 <span class="l" style="--d:3836ms">Done. applyDiscount now throws a RangeError before any calculation when percent</span>
@@ -257,12 +283,514 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
 <span class="l" style="--d:7384ms"><span class="warn">[delegate] antigravity produced no image, trying codex imagegen</span></span>
 <span class="l" style="--d:7416ms">wrote cart-icon.png (codex imagegen, free)<span class="caret"></span></span>
 </p>
+          <p class="preview" style="--d:7500ms">
+            <img src="data:image/png;base64,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" width="96" height="96" alt="a flat-design shopping cart icon">
+            <span><b>Shown on this page, not in the terminal.</b>The command prints the path and nothing
+            more; open the file to see it. This is what that prompt actually returns, at 96&#215;96
+            of the 1024&#215;1024 the model draws.</span>
+          </p>
         </div>
 
       </div>
-      <div class="term-foot" style="--d:7618ms">
+      <div class="term-foot" style="--d:7700ms">
         Spend for that session: <b>nothing</b>. Every step ran on a subscription that was already being
         paid for — and the review caught a real hole in the guard that had just been written.
+      </div>
+    </div>
+  </div>
+
+  <div class="pane pane-gif">
+    <p class="caption">A skill built <b>on top of another skill</b>: <code>gif</code> spends one
+    <code>delegate</code> image call on a sprite sheet, then does every pixel of the assembly locally.
+    An <b>illustrative run</b> — the commands, the flags and the shape of the output are real, the
+    subject is not a specific recorded session.</p>
+
+    <div class="term">
+      <div class="term-bar">
+        <b>a 32px transparent looping icon, and what is really in the file</b>
+        <span>2 commands · 1 image call · $0</span>
+      </div>
+      <div class="term-body">
+
+        <div class="step">
+          <p class="cmd"><span class="type" style="--w:58ch;--dur:900ms;--d:250ms;--n:58">gif.sh make "a coin spinning end over end" coin.gif --show</span></p>
+          <p class="note" style="--d:1260ms">Defaults are the ones you nearly always want: 32&times;32, transparent, one second, loops forever. <code>--show</code> draws the finished file in the terminal, and the path it prints is a link you can click. <span class="who">free · plan</span></p>
+          <p class="res">
+<span class="l" style="--d:1340ms">[gif] generating a sprite sheet of 8 frames</span>
+<span class="l" style="--d:1372ms">wrote /tmp/&#8230;/sheet.png (antigravity, free)</span>
+<span class="l" style="--d:1404ms">gifpack: sheet is 1376x768, reading it as 4 x 2</span>
+<span class="l" style="--d:1436ms">wrote <span class="path">coin.gif</span> (32x32, 8 frames, 1.00s, loop=forever, transparent)</span>
+<span class="l" style="--d:1468ms">file        coin.gif</span>
+<span class="l" style="--d:1500ms">format      GIF</span>
+<span class="l" style="--d:1532ms">size        32x32</span>
+<span class="l" style="--d:1564ms">frames      8</span>
+<span class="l" style="--d:1596ms">duration    1.00s  (delays ms: [130, 130, 130, 130, 120, 120, 120, 120])</span>
+<span class="l" style="--d:1628ms">loop        forever</span>
+<span class="l" style="--d:1660ms">transparent yes (index 63)</span>
+<span class="l" style="--d:1692ms">bytes       4707</span>
+</p>
+          <p class="preview" style="--d:1780ms">
+            <img src="data:image/gif;base64,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" width="32" height="32" alt="a gold coin spinning end over end, 32x32">
+            <img src="data:image/gif;base64,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" width="96" height="96" alt="the same coin at 3x, showing the pixels">
+            <span><b>Shown on this page, not in the terminal by default.</b><code>--show</code> draws the GIF
+            inline only where iTerm2's <code>imgcat</code>, <code>chafa</code> or <code>viu</code> is
+            installed; everywhere else you click the underlined path. This is coin.gif itself,
+            32&#215;32 as written and at 3&#215;.</span>
+          </p>
+        </div>
+
+        <div class="step">
+          <p class="cmd"><span class="type" style="--w:62ch;--dur:900ms;--d:2050ms;--n:62">gif.sh sheet sheet.png coin-64.gif --cols 4 --rows 2 --size 64</span></p>
+          <p class="note" style="--d:3060ms">Every write ends with that report, read back off the finished file — <code>gif.sh probe</code> runs it on any GIF, including ones you did not make here. Re-cutting the sheet you kept spends no quota at all.</p>
+          <p class="res">
+<span class="l" style="--d:3320ms">gifpack: sheet is 1376x768, reading it as 4 x 2</span>
+<span class="l" style="--d:3352ms">wrote <span class="path">coin-64.gif</span> (64x64, 8 frames, 1.00s, loop=forever, transparent)</span>
+<span class="l" style="--d:3384ms">file        coin-64.gif</span>
+<span class="l" style="--d:3416ms">format      GIF</span>
+<span class="l" style="--d:3448ms">size        64x64</span>
+<span class="l" style="--d:3480ms">frames      8</span>
+<span class="l" style="--d:3512ms">duration    1.00s  (delays ms: [130, 130, 130, 130, 120, 120, 120, 120])</span>
+<span class="l" style="--d:3544ms">loop        forever</span>
+<span class="l" style="--d:3576ms">transparent yes (index 63)</span>
+<span class="l" style="--d:3608ms">bytes       10775<span class="caret"></span></span>
+</p>
+        </div>
+
+      </div>
+      <div class="term-foot" style="--d:3700ms">
+        The image model cannot draw transparency, so the prompt asks for a flat magenta backdrop and the
+        key removes it — which only works if the frames are cut where the model actually drew them,
+        so the layout is read off the sheet rather than assumed. Sizes stop at 16/32/64/128 and
+        duration at three seconds: the format's own limits, refused loudly rather than rounded.
+      </div>
+    </div>
+  </div>
+
+  <div class="pane pane-svg">
+    <p class="caption">The same shape as <code>gif</code>, but an SVG is <b>code</b> — so it comes from
+    a delegate <em>text</em> tier, not an image model, and everything a model cannot be trusted with
+    is enforced locally. An <b>illustrative run</b>: the commands, the flags and the shape of the
+    output are real.</p>
+
+    <div class="term">
+      <div class="term-bar">
+        <b>a CSS-animated icon, a frame sequence, and a look inside the file</b>
+        <span>2 commands · text tier · $0</span>
+      </div>
+      <div class="term-body">
+
+        <div class="step">
+          <p class="cmd"><span class="type" style="--w:50ch;--dur:900ms;--d:250ms;--n:50">svg.sh make "a ringing notification bell" bell.svg</span></p>
+          <p class="note" style="--d:1260ms">CSS by default: restyleable from the page that embeds it, and it can honour <code>prefers-reduced-motion</code> — which SMIL cannot express at all. <span class="who">free · plan</span></p>
+          <p class="res">
+<span class="l" style="--d:1340ms">[svg] asking delegate (code) for the source</span>
+<span class="l" style="--d:1372ms">wrote <span class="path">bell.svg</span> (32x32, animated (CSS), transparent, 2812 bytes)</span>
+<span class="l" style="--d:1404ms">file        bell.svg</span>
+<span class="l" style="--d:1436ms">size        32 x 32</span>
+<span class="l" style="--d:1468ms">viewBox     0 0 100 100</span>
+<span class="l" style="--d:1500ms">elements    11</span>
+<span class="l" style="--d:1532ms">animation   CSS, cycle 1.000s</span>
+<span class="l" style="--d:1564ms">loop        infinite</span>
+<span class="l" style="--d:1596ms">reduced     honours prefers-reduced-motion</span>
+<span class="l" style="--d:1628ms">background  transparent</span>
+<span class="l" style="--d:1660ms">bytes       2812</span>
+<span class="l" style="--d:1692ms">unsafe      none</span>
+</p>
+          <p class="preview" style="--d:1780ms">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+<style>
+.bell {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: ring 1s infinite;
+}
+.clapper {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: clap 1s infinite;
+}
+.wave-l {
+  transform-box: fill-box;
+  transform-origin: 100% 50%;
+  animation: wave-left 1s infinite;
+}
+.wave-r {
+  transform-box: fill-box;
+  transform-origin: 0% 50%;
+  animation: wave-right 1s infinite;
+}
+@keyframes ring {
+  0%   { transform: rotate(0deg); }
+  10%  { transform: rotate(-18deg); }
+  25%  { transform: rotate(18deg); }
+  40%  { transform: rotate(-14deg); }
+  55%  { transform: rotate(14deg); }
+  68%  { transform: rotate(-6deg); }
+  78%  { transform: rotate(6deg); }
+  88%  { transform: rotate(-2deg); }
+  95%  { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes clap {
+  0%   { transform: rotate(0deg); }
+  10%  { transform: rotate(16deg); }
+  25%  { transform: rotate(-16deg); }
+  40%  { transform: rotate(12deg); }
+  55%  { transform: rotate(-12deg); }
+  68%  { transform: rotate(6deg); }
+  78%  { transform: rotate(-6deg); }
+  88%  { transform: rotate(2deg); }
+  95%  { transform: rotate(-2deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes wave-left {
+  0%   { opacity: 0; transform: scaleX(0.6); }
+  15%  { opacity: 0; }
+  30%  { opacity: 1; transform: scaleX(1); }
+  55%  { opacity: 1; transform: scaleX(1); }
+  75%  { opacity: 0; transform: scaleX(0.6); }
+  100% { opacity: 0; transform: scaleX(0.6); }
+}
+@keyframes wave-right {
+  0%   { opacity: 0; transform: scaleX(0.6); }
+  15%  { opacity: 0; }
+  30%  { opacity: 1; transform: scaleX(1); }
+  55%  { opacity: 1; transform: scaleX(1); }
+  75%  { opacity: 0; transform: scaleX(0.6); }
+  100% { opacity: 0; transform: scaleX(0.6); }
+}
+
+* { animation-iteration-count: infinite; }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<g class="bell">
+  <path d="M50 10 C50 10 50 10 50 10 Q50 8 52 8 Q54 8 54 10 L54 14 Q68 18 72 36 L75 62 L82 68 Q85 71 85 74 L15 74 Q15 71 18 68 L25 62 L28 36 Q32 18 46 14 L46 10 Q46 8 48 8 Q50 8 50 10Z" fill="#F5A623" />
+  <rect x="15" y="71" width="70" height="7" rx="3.5" fill="#E8951C" />
+  <ellipse cx="50" cy="81" rx="9" ry="5" fill="#E8951C" />
+  <ellipse cx="50" cy="83" rx="6" ry="4" fill="#F5A623" />
+  <g class="clapper">
+    <ellipse cx="50" cy="80" rx="5" ry="5" fill="#C07010" />
+  </g>
+</g>
+<path class="wave-l" d="M22 55 Q14 48 14 38 Q14 32 18 27" fill="none" stroke="#F5A623" stroke-width="5" stroke-linecap="round" />
+<path class="wave-r" d="M78 55 Q86 48 86 38 Q86 32 82 27" fill="none" stroke="#F5A623" stroke-width="5" stroke-linecap="round" />
+</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="96" height="96" preserveAspectRatio="xMidYMid meet">
+<g class="bell">
+  <path d="M50 10 C50 10 50 10 50 10 Q50 8 52 8 Q54 8 54 10 L54 14 Q68 18 72 36 L75 62 L82 68 Q85 71 85 74 L15 74 Q15 71 18 68 L25 62 L28 36 Q32 18 46 14 L46 10 Q46 8 48 8 Q50 8 50 10Z" fill="#F5A623" />
+  <rect x="15" y="71" width="70" height="7" rx="3.5" fill="#E8951C" />
+  <ellipse cx="50" cy="81" rx="9" ry="5" fill="#E8951C" />
+  <ellipse cx="50" cy="83" rx="6" ry="4" fill="#F5A623" />
+  <g class="clapper">
+    <ellipse cx="50" cy="80" rx="5" ry="5" fill="#C07010" />
+  </g>
+</g>
+<path class="wave-l" d="M22 55 Q14 48 14 38 Q14 32 18 27" fill="none" stroke="#F5A623" stroke-width="5" stroke-linecap="round" />
+<path class="wave-r" d="M78 55 Q86 48 86 38 Q86 32 82 27" fill="none" stroke="#F5A623" stroke-width="5" stroke-linecap="round" />
+</svg>
+            <span><b>Shown on this page, not in the terminal.</b>No terminal draws SVG &#8212; the underlined
+            path opens it in a browser, which is where it animates. bell.svg itself, 32&#215;32 and
+            at 3&#215;: the CSS travels with the file, so it rocks here and holds still if your
+            system asks for reduced motion.</span>
+          </p>
+        </div>
+
+        <div class="step">
+          <p class="cmd"><span class="type" style="--w:49ch;--dur:900ms;--d:2050ms;--n:49">svg.sh make "a walking robot" walk.svg --frames 6</span></p>
+          <p class="note" style="--d:3060ms">For motion no tween can express. The model draws six moments and nothing else; the step-end keyframes and the negative per-frame delays are written here, because that is arithmetic a model gets wrong and drawing is not.</p>
+          <p class="res">
+<span class="l" style="--d:3320ms">[svg] asking delegate (code) for the source</span>
+<span class="l" style="--d:3352ms">wrote <span class="path">walk.svg</span> (32x32, 6-frame sequence, transparent, 11862 bytes)</span>
+<span class="l" style="--d:3384ms">file        walk.svg</span>
+<span class="l" style="--d:3416ms">size        32 x 32</span>
+<span class="l" style="--d:3448ms">viewBox     0 0 100 100</span>
+<span class="l" style="--d:3480ms">elements    128</span>
+<span class="l" style="--d:3512ms">animation   6-frame sequence, cycle 1.000s</span>
+<span class="l" style="--d:3544ms">loop        infinite</span>
+<span class="l" style="--d:3576ms">reduced     honours prefers-reduced-motion</span>
+<span class="l" style="--d:3608ms">background  transparent</span>
+<span class="l" style="--d:3640ms">bytes       11862</span>
+<span class="l" style="--d:3672ms">unsafe      none<span class="caret"></span></span>
+</p>
+          <p class="preview" style="--d:3760ms">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+<style>
+.spk-frame { opacity: 0; animation: spk-frame-cycle 1s step-end infinite; }
+@keyframes spk-frame-cycle { 0% { opacity: 1 } 16.6667% { opacity: 0 } }
+.spk-frame-1 { animation-delay: -0.1667s; }
+.spk-frame-2 { animation-delay: -0.3333s; }
+.spk-frame-3 { animation-delay: -0.5s; }
+.spk-frame-4 { animation-delay: -0.6667s; }
+.spk-frame-5 { animation-delay: -0.8333s; }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } .spk-frame { opacity: 0 } .spk-frame-0 { opacity: 1 } }
+</style><g class="spk-frame spk-frame-0">
+  <rect x="35" y="8" width="30" height="22" rx="4" ry="4" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="52" y="14" width="8" height="6" rx="2" ry="2" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <line x1="50" y1="8" x2="50" y2="2" stroke="#1a3a5c" stroke-width="3" stroke-linecap="round" />
+  <circle cx="50" cy="2" r="2.5" fill="#ff6b6b" />
+  <rect x="44" y="30" width="12" height="5" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="35" width="44" height="28" rx="5" ry="5" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="38" y="41" width="12" height="8" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="1.5" />
+  <circle cx="58" cy="45" r="4" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <rect x="18" y="36" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="15" y="54" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="71" y="36" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="74" y="54" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="32" y="63" width="36" height="8" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="71" width="13" height="16" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="85" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="95" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+  <rect x="53" y="71" width="13" height="16" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="53" y="85" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="52" y="95" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+</g>
+<g class="spk-frame spk-frame-1">
+  <rect x="35" y="8" width="30" height="22" rx="4" ry="4" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="52" y="14" width="8" height="6" rx="2" ry="2" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <line x1="50" y1="8" x2="50" y2="2" stroke="#1a3a5c" stroke-width="3" stroke-linecap="round" />
+  <circle cx="50" cy="2" r="2.5" fill="#ff6b6b" />
+  <rect x="44" y="30" width="12" height="5" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="35" width="44" height="28" rx="5" ry="5" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="38" y="41" width="12" height="8" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="1.5" />
+  <circle cx="58" cy="45" r="4" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <rect x="18" y="38" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="15" y="56" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="71" y="34" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="74" y="52" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="32" y="63" width="36" height="8" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="71" width="13" height="14" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="36" y="83" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="30" y="93" width="18" height="5" rx="2" ry="2" fill="#1a3a5c" />
+  <rect x="53" y="69" width="13" height="14" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="55" y="81" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="55" y="91" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+</g>
+<g class="spk-frame spk-frame-2">
+  <rect x="35" y="8" width="30" height="22" rx="4" ry="4" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="52" y="14" width="8" height="6" rx="2" ry="2" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <line x1="50" y1="8" x2="50" y2="2" stroke="#1a3a5c" stroke-width="3" stroke-linecap="round" />
+  <circle cx="50" cy="2" r="2.5" fill="#ff6b6b" />
+  <rect x="44" y="30" width="12" height="5" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="35" width="44" height="28" rx="5" ry="5" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="38" y="41" width="12" height="8" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="1.5" />
+  <circle cx="58" cy="45" r="4" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <rect x="18" y="34" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="15" y="52" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="71" y="38" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="74" y="56" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="32" y="63" width="36" height="8" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="69" width="13" height="14" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="32" y="81" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="91" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+  <rect x="53" y="71" width="13" height="16" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="53" y="85" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="52" y="95" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+</g>
+<g class="spk-frame spk-frame-3">
+  <rect x="35" y="8" width="30" height="22" rx="4" ry="4" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="52" y="14" width="8" height="6" rx="2" ry="2" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <line x1="50" y1="8" x2="50" y2="2" stroke="#1a3a5c" stroke-width="3" stroke-linecap="round" />
+  <circle cx="50" cy="2" r="2.5" fill="#ff6b6b" />
+  <rect x="44" y="30" width="12" height="5" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="35" width="44" height="28" rx="5" ry="5" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="38" y="41" width="12" height="8" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="1.5" />
+  <circle cx="58" cy="45" r="4" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <rect x="18" y="36" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="15" y="54" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="71" y="36" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="74" y="54" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="32" y="63" width="36" height="8" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="71" width="13" height="16" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="85" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="95" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+  <rect x="53" y="71" width="13" height="16" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="53" y="85" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="52" y="95" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+</g>
+<g class="spk-frame spk-frame-4">
+  <rect x="35" y="8" width="30" height="22" rx="4" ry="4" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="52" y="14" width="8" height="6" rx="2" ry="2" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <line x1="50" y1="8" x2="50" y2="2" stroke="#1a3a5c" stroke-width="3" stroke-linecap="round" />
+  <circle cx="50" cy="2" r="2.5" fill="#ff6b6b" />
+  <rect x="44" y="30" width="12" height="5" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="35" width="44" height="28" rx="5" ry="5" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="38" y="41" width="12" height="8" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="1.5" />
+  <circle cx="58" cy="45" r="4" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <rect x="18" y="34" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="15" y="52" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="71" y="38" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="74" y="56" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="32" y="63" width="36" height="8" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="69" width="13" height="14" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="36" y="81" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="36" y="91" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+  <rect x="53" y="71" width="13" height="14" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="51" y="83" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="50" y="93" width="18" height="5" rx="2" ry="2" fill="#1a3a5c" />
+</g>
+<g class="spk-frame spk-frame-5">
+  <rect x="35" y="8" width="30" height="22" rx="4" ry="4" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="52" y="14" width="8" height="6" rx="2" ry="2" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <line x1="50" y1="8" x2="50" y2="2" stroke="#1a3a5c" stroke-width="3" stroke-linecap="round" />
+  <circle cx="50" cy="2" r="2.5" fill="#ff6b6b" />
+  <rect x="44" y="30" width="12" height="5" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="35" width="44" height="28" rx="5" ry="5" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="38" y="41" width="12" height="8" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="1.5" />
+  <circle cx="58" cy="45" r="4" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <rect x="71" y="34" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="74" y="52" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="18" y="38" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="15" y="56" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="32" y="63" width="36" height="8" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="71" width="13" height="16" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="85" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="95" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+  <rect x="53" y="69" width="13" height="14" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="55" y="81" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="55" y="91" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+</g>
+</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="96" height="96" preserveAspectRatio="xMidYMid meet">
+<g class="spk-frame spk-frame-0">
+  <rect x="35" y="8" width="30" height="22" rx="4" ry="4" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="52" y="14" width="8" height="6" rx="2" ry="2" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <line x1="50" y1="8" x2="50" y2="2" stroke="#1a3a5c" stroke-width="3" stroke-linecap="round" />
+  <circle cx="50" cy="2" r="2.5" fill="#ff6b6b" />
+  <rect x="44" y="30" width="12" height="5" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="35" width="44" height="28" rx="5" ry="5" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="38" y="41" width="12" height="8" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="1.5" />
+  <circle cx="58" cy="45" r="4" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <rect x="18" y="36" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="15" y="54" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="71" y="36" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="74" y="54" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="32" y="63" width="36" height="8" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="71" width="13" height="16" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="85" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="95" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+  <rect x="53" y="71" width="13" height="16" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="53" y="85" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="52" y="95" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+</g>
+<g class="spk-frame spk-frame-1">
+  <rect x="35" y="8" width="30" height="22" rx="4" ry="4" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="52" y="14" width="8" height="6" rx="2" ry="2" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <line x1="50" y1="8" x2="50" y2="2" stroke="#1a3a5c" stroke-width="3" stroke-linecap="round" />
+  <circle cx="50" cy="2" r="2.5" fill="#ff6b6b" />
+  <rect x="44" y="30" width="12" height="5" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="35" width="44" height="28" rx="5" ry="5" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="38" y="41" width="12" height="8" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="1.5" />
+  <circle cx="58" cy="45" r="4" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <rect x="18" y="38" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="15" y="56" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="71" y="34" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="74" y="52" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="32" y="63" width="36" height="8" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="71" width="13" height="14" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="36" y="83" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="30" y="93" width="18" height="5" rx="2" ry="2" fill="#1a3a5c" />
+  <rect x="53" y="69" width="13" height="14" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="55" y="81" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="55" y="91" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+</g>
+<g class="spk-frame spk-frame-2">
+  <rect x="35" y="8" width="30" height="22" rx="4" ry="4" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="52" y="14" width="8" height="6" rx="2" ry="2" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <line x1="50" y1="8" x2="50" y2="2" stroke="#1a3a5c" stroke-width="3" stroke-linecap="round" />
+  <circle cx="50" cy="2" r="2.5" fill="#ff6b6b" />
+  <rect x="44" y="30" width="12" height="5" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="35" width="44" height="28" rx="5" ry="5" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="38" y="41" width="12" height="8" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="1.5" />
+  <circle cx="58" cy="45" r="4" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <rect x="18" y="34" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="15" y="52" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="71" y="38" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="74" y="56" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="32" y="63" width="36" height="8" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="69" width="13" height="14" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="32" y="81" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="91" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+  <rect x="53" y="71" width="13" height="16" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="53" y="85" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="52" y="95" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+</g>
+<g class="spk-frame spk-frame-3">
+  <rect x="35" y="8" width="30" height="22" rx="4" ry="4" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="52" y="14" width="8" height="6" rx="2" ry="2" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <line x1="50" y1="8" x2="50" y2="2" stroke="#1a3a5c" stroke-width="3" stroke-linecap="round" />
+  <circle cx="50" cy="2" r="2.5" fill="#ff6b6b" />
+  <rect x="44" y="30" width="12" height="5" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="35" width="44" height="28" rx="5" ry="5" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="38" y="41" width="12" height="8" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="1.5" />
+  <circle cx="58" cy="45" r="4" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <rect x="18" y="36" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="15" y="54" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="71" y="36" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="74" y="54" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="32" y="63" width="36" height="8" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="71" width="13" height="16" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="85" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="95" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+  <rect x="53" y="71" width="13" height="16" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="53" y="85" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="52" y="95" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+</g>
+<g class="spk-frame spk-frame-4">
+  <rect x="35" y="8" width="30" height="22" rx="4" ry="4" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="52" y="14" width="8" height="6" rx="2" ry="2" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <line x1="50" y1="8" x2="50" y2="2" stroke="#1a3a5c" stroke-width="3" stroke-linecap="round" />
+  <circle cx="50" cy="2" r="2.5" fill="#ff6b6b" />
+  <rect x="44" y="30" width="12" height="5" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="35" width="44" height="28" rx="5" ry="5" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="38" y="41" width="12" height="8" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="1.5" />
+  <circle cx="58" cy="45" r="4" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <rect x="18" y="34" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="15" y="52" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="71" y="38" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="74" y="56" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="32" y="63" width="36" height="8" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="69" width="13" height="14" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="36" y="81" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="36" y="91" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+  <rect x="53" y="71" width="13" height="14" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="51" y="83" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="50" y="93" width="18" height="5" rx="2" ry="2" fill="#1a3a5c" />
+</g>
+<g class="spk-frame spk-frame-5">
+  <rect x="35" y="8" width="30" height="22" rx="4" ry="4" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="52" y="14" width="8" height="6" rx="2" ry="2" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <line x1="50" y1="8" x2="50" y2="2" stroke="#1a3a5c" stroke-width="3" stroke-linecap="round" />
+  <circle cx="50" cy="2" r="2.5" fill="#ff6b6b" />
+  <rect x="44" y="30" width="12" height="5" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="35" width="44" height="28" rx="5" ry="5" fill="#4a90d9" stroke="#1a3a5c" stroke-width="3" />
+  <rect x="38" y="41" width="12" height="8" rx="2" ry="2" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="1.5" />
+  <circle cx="58" cy="45" r="4" fill="#ffe066" stroke="#b8860b" stroke-width="1.5" />
+  <rect x="71" y="34" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="74" y="52" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="18" y="38" width="11" height="20" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="15" y="56" width="11" height="14" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="32" y="63" width="36" height="8" rx="3" ry="3" fill="#2c5f8a" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="71" width="13" height="16" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="34" y="85" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="28" y="95" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+  <rect x="53" y="69" width="13" height="14" rx="4" ry="4" fill="#357abd" stroke="#1a3a5c" stroke-width="2.5" />
+  <rect x="55" y="81" width="13" height="12" rx="3" ry="3" fill="#4a90d9" stroke="#1a3a5c" stroke-width="2" />
+  <rect x="55" y="91" width="20" height="5" rx="2" ry="2" fill="#1a3a5c" />
+</g>
+</svg>
+            <span><b>Shown on this page, not in the terminal.</b>walk.svg opened the same way &#8212; six drawn
+            moments, no tween. Step-end keyframes hold each one for a sixth of the second.</span>
+          </p>
+        </div>
+
+      </div>
+      <div class="term-foot" style="--d:4000ms">
+        One loop lasts exactly the duration you asked for: times are scaled by the ratio, so a dot
+        delayed a sixth of the way through stays a sixth of the way through. Scripts, event handlers,
+        external references and DOCTYPEs never reach the file at all &#8212; and <code>svg.sh probe</code>
+        reports the same for an SVG you did not generate here, exiting nonzero on anything unsafe.
       </div>
     </div>
   </div>
@@ -297,7 +825,11 @@ footer{margin-top:72px;padding:26px 0 48px;border-top:1px solid var(--line);
 cd ~/code/skills
 ln -s "$PWD/delegate" ~/.claude/skills/delegate
 ln -s "$PWD/delegate" ~/.codex/skills/delegate
-ln -s "$PWD/delegate/scripts/delegate.sh" ~/.local/bin/</pre>
+ln -s "$PWD/gif" ~/.claude/skills/gif
+ln -s "$PWD/svg" ~/.claude/skills/svg
+ln -s "$PWD/delegate/scripts/delegate.sh" ~/.local/bin/
+ln -s "$PWD/gif/scripts/gif.sh" ~/.local/bin/
+ln -s "$PWD/svg/scripts/svg.sh" ~/.local/bin/</pre>
   </div>
 </section>
 
@@ -369,5 +901,18 @@ printf '%s' "$k" &gt; ~/.config/google-ai/key; chmod 600 ~/.config/google-ai/key
 </footer>
 
 </div>
+<script>
+// Each transcript plays once. The panes are CSS-only radio tabs, and display:none cancels a
+// running animation, so a tab you come back to would type itself out again from nothing.
+(function(){
+  var shown = document.querySelector('.pane-delegate');
+  document.querySelectorAll('input[name=skill]').forEach(function(r){
+    r.addEventListener('change', function(){
+      shown.classList.add('done');
+      shown = document.querySelector('.pane-' + r.id.slice(2));
+    });
+  });
+})();
+</script>
 </body>
 </html>

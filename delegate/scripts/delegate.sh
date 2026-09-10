@@ -127,13 +127,18 @@ apply_skill() { # provider, prompt
 run_agy() { # model, prompt   (uses DIR / WRITE)
   [ -x "$AGY" ] || die "antigravity CLI not installed"
   local model="$1" p="$2" mode=(--sandbox) marker rc=0
-  # A non-interactive run has nobody to approve a shell prompt, so any command the agent reaches
-  # for just kills the run. Steer it onto its file tools in BOTH modes, not only --write.
-  p="Using your file read/write tools ONLY (do not run any shell/terminal commands): $p"
+  # A non-interactive run has nobody to approve a prompt, so any tool the agent reaches for that
+  # needs approval just kills the run: no output, no file, no useful error. Steer it onto the tools
+  # that are actually allowed in this mode -- writing is only approved under --write, so a
+  # read-only call that reaches for write_file dies exactly the way a shell command would.
   if [ -n "$WRITE" ]; then
     mode=(--sandbox --mode accept-edits)
+    p="Using your file read/write tools ONLY (do not run any shell/terminal commands): $p"
     p="$p [Write files into the workspace directory $DIR itself, not into any artifact directory.]"
     marker="$(mktemp "$TMP/wm.XXXXXX")"
+  else
+    p="Read files with your file read tools if you need to, but do not write or edit any file and \
+do not run any shell/terminal commands. Put the whole answer in your reply text: $p"
   fi
   p="$(apply_skill agy "$p")"
   # --add-dir is required: without it the agent has no workspace and permission checks deny it.

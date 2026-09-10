@@ -1,0 +1,7 @@
+Here are the four frames:
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <g id="frame-1"><rect x="20" y="20" width="26" height="26" rx="5" fill="#f472b6"/></g>
+  <g id="frame-2"><rect x="54" y="20" width="26" height="26" rx="5" fill="#f472b6"/></g>
+  <g id="frame-3"><rect x="54" y="54" width="26" height="26" rx="5" fill="#f472b6"/></g>
+  <g id="frame-4"><rect x="20" y="54" width="26" height="26" rx="5" fill="#f472b6"/></g>
+</svg>

