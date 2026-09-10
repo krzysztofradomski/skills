@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Run every suite. No arguments runs them all; name one or more to run a subset.
-#   bash tests/run.sh                # everything available
+#   bash tests/run.sh                # everything available (fakes only, no quota spent)
 #   bash tests/run.sh svg gif        # just those
 #   bash tests/run.sh --no-render    # skip the browser suite
+#   bash tests/run.sh real           # opt-in: against a real provider, spends plan allowance
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 PY="${PYTHON:-python3}"
@@ -17,6 +18,8 @@ for a in "$@"; do
   esac
 done
 [ ${#want[@]} -gt 0 ] || want=(delegate svg gif install render)
+# "real" is opt-in only -- it spends real plan allowance, so it is never in the default set and
+# must be named explicitly, same as --no-render opts the browser suite out.
 
 failed=(); ran=0
 for suite in "${want[@]}"; do
@@ -27,13 +30,13 @@ for suite in "${want[@]}"; do
       ran=$((ran + 1))
       "$PY" "$HERE/test_render.py" || failed+=(render)
       ;;
-    delegate|svg|gif|install)
+    delegate|svg|gif|install|real)
       [ -f "$HERE/test_$suite.sh" ] || { echo "no suite: $suite" >&2; exit 2; }
       printf '\n\033[1m== %s\033[0m\n' "$suite"
       ran=$((ran + 1))
       bash "$HERE/test_$suite.sh" || failed+=("$suite")
       ;;
-    *) echo "run.sh: no such suite: $suite (delegate svg gif install render)" >&2; exit 2 ;;
+    *) echo "run.sh: no such suite: $suite (delegate svg gif install render real)" >&2; exit 2 ;;
   esac
 done
 

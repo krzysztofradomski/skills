@@ -6,21 +6,21 @@
       "description": "Delegate work from the current Claude Code or Codex session to other providers - Antigravity CLI, Codex CLI, and OpenRouter free models - using existing plan allowances without switching IDEs or chat apps, and picking a model that matches the task's difficulty and cost. Use when the user says delegate, orchestrate, use another provider, use a cheaper model, save tokens, run a code review, or asks for sub-agents. Also generates images for free.",
       "type": "archive",
       "url": "https://ai-skills.radomski.dev/agent-skills/delegate.tar.gz",
-      "digest": "sha256:441aa5cdd52065d8f14ee48717726b4cfee2b4fe4d2a049b9efab49349f7f3fc"
+      "digest": "sha256:eea40ec8fdb4ada6825d754921071edc91144d23869c9203f6aa87b99237796c"
     },
     {
       "name": "gif",
       "description": "Make small looping animated GIFs - square 16x16, 32x32, 64x64 or 128x128, transparent or on a solid background, up to 3 seconds. Generates the frames through the delegate skill on plan allowance (free) and assembles them locally, or assembles frames and sprite sheets you already have. Use when the user asks for a GIF, an animated icon, sprite, loader, spinner, emoji, favicon, pixel-art animation, or wants stills turned into a looping animation.",
       "type": "archive",
       "url": "https://ai-skills.radomski.dev/agent-skills/gif.tar.gz",
-      "digest": "sha256:6d6c8e27eef73c326c3d3cbbab323e1d38f2d3d361a9d24186f2cc1c19bf58a0"
+      "digest": "sha256:6760d8f2e33d78002e9c64f6c7c16c2a43a9dfb376a6996278a9c4809ae84500"
     },
     {
       "name": "svg",
       "description": "Make small SVG icons - CSS-animated and looping by default, a single still with --still, or a frame-by-frame sequence with --frames N. Square 16x16, 32x32, 64x64 or 128x128, transparent or on a solid background, loops up to 3 seconds. Asks a delegate text model for the source (plan allowance, free), then sanitizes, resizes and re-times it locally. Use when the user asks for an SVG, a vector icon, a spinner or loader, an animated logo mark, a favicon, or wants an icon they can restyle in code afterwards.",
       "type": "archive",
       "url": "https://ai-skills.radomski.dev/agent-skills/svg.tar.gz",
-      "digest": "sha256:d6f6abd95095e7e5d4fb47dd16fc6d68876ba447686a115f1ddd917c29a2b7af"
+      "digest": "sha256:cbdf5f748e25733e6e6bed7ef1b9730c7bfb9fcbb69a6268c5fbd553449c793a"
     }
   ]
 }

@@ -271,6 +271,29 @@ run "$DELEGATE"
 expect_fail "refuses to run with no verb"
 expect_has "usage:" "and prints usage"
 
+section "timeout guard"
+# A provider that never returns at all -- not even a nonzero exit, just silence -- is the exact
+# shape that used to hang svg.sh/gif.sh forever with nothing to interrupt it. Backgrounding the
+# sleep and waiting on it (rather than a plain foreground `sleep`) also means a broken guard that
+# only kills the top process, not its children, would still leave this hung.
+cat > "$BIN/agy" <<'FAKE'
+#!/usr/bin/env bash
+sleep 3600 &
+wait
+FAKE
+chmod +x "$BIN/agy"
+start=$(date +%s)
+run_sh "DELEGATE_TIMEOUT=2 '$DELEGATE' code 'do it' '$WORK'"
+elapsed=$(( $(date +%s) - start ))
+expect_fail "a provider that never returns is killed rather than hung on forever"
+[ "$elapsed" -le 15 ] && pass "and control comes back within the configured budget" \
+  || fail "and control comes back within the configured budget" "took ${elapsed}s (budget was 2s)"
+sleep 1  # let the killed process's own children (if any leaked) show up in ps before we check
+pgrep -f "sleep 3600" >/dev/null \
+  && fail "does not leave the hung provider's own children running" "found a leaked 'sleep 3600'" \
+  || pass "does not leave the hung provider's own children running"
+make_fake_agy   # restore the normal, fast fake for anything after this point
+
 section "images: free before paid"
 rm -rf "$HOME/.gemini"
 run "$DELEGATE" image "a green leaf" "$TMP/out/leaf.png"

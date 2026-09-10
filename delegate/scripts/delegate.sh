@@ -21,6 +21,31 @@ M_WRITE="${M_WRITE:-gemini-3.1-pro-high}"
 
 die() { echo "delegate: $*" >&2; exit 2; }
 
+# No `timeout`/`gtimeout` on stock macOS, so build one from perl (ships with macOS and virtually
+# every Linux) instead of bash job control -- `set -m` here made this hang inside nested command
+# substitution under some shells' terminal handling, which is worse than the bug it fixed. Perl
+# forks, puts the child in its own process group, and on alarm kills that whole group, so a CLI's
+# own children die with it too. Every external agy/codex call goes through this -- without it, a
+# stalled provider hangs the caller (svg.sh, gif.sh, ...) forever with nothing to interrupt it.
+CLI_TIMEOUT="${DELEGATE_TIMEOUT:-240}"
+with_timeout() { # cmd...
+  perl -e '
+    my $secs = shift @ARGV;
+    my $pid = fork();
+    die "fork failed: $!" unless defined $pid;
+    if ($pid == 0) {
+      eval { require POSIX; POSIX::setpgid(0, 0) };
+      exec(@ARGV) or exit(127);
+    }
+    local $SIG{ALRM} = sub { kill(-15, $pid); kill(15, $pid); };
+    alarm($secs);
+    waitpid($pid, 0);
+    my $rc = $?;
+    alarm(0);
+    exit($rc & 127 ? 128 + ($rc & 127) : $rc >> 8);
+  ' "$CLI_TIMEOUT" "$@"
+}
+
 # Review must come from a different vendor than the agent that wrote the code, so the reviewer is
 # chosen against whichever CLI we are running inside.
 host_agent() {
@@ -49,13 +74,13 @@ trap 'rm -rf "$TMP"; exit 143' TERM
 curl_key() { # header-line, curl args... ; body on stdin
   local cfg; cfg="$(mktemp "$TMP/cfg.XXXXXX")"; chmod 600 "$cfg"
   printf 'header = "%s"\n' "$1" > "$cfg"; shift
-  curl -s -K "$cfg" "$@"
+  curl -s --connect-timeout 15 --max-time "$CLI_TIMEOUT" -K "$cfg" "$@"
 }
 
 # Zero-priced OpenRouter models, best-first. `:free` alone misses stealth/*, which is where the
 # cloaked frontier models live -- match on price, not on the id suffix.
 free_models() {
-  curl -s "$OR_URL/models" | jq -r '
+  curl -s --connect-timeout 15 --max-time "$CLI_TIMEOUT" "$OR_URL/models" | jq -r '
     [ .data[]
       | select(.pricing.prompt=="0" and .pricing.completion=="0")
       | select(.id|test("lyria|openrouter/free")|not)          # music models and the meta-router
@@ -142,7 +167,7 @@ do not run any shell/terminal commands. Put the whole answer in your reply text:
   fi
   p="$(apply_skill agy "$p")"
   # --add-dir is required: without it the agent has no workspace and permission checks deny it.
-  ( cd "$DIR" && "$AGY" -p "$p" "${mode[@]}" --add-dir "$DIR" --model "$model" </dev/null ) || rc=$?
+  ( cd "$DIR" && with_timeout "$AGY" -p "$p" "${mode[@]}" --add-dir "$DIR" --model "$model" </dev/null ) || rc=$?
   # Some models' write tool is confined to their own artifact dir, so they report "Done!" having
   # touched nothing here (observed on claude-sonnet-4-6). Verify the workspace actually changed.
   if [ -n "$WRITE" ]; then
@@ -153,7 +178,7 @@ do not run any shell/terminal commands. Put the whole answer in your reply text:
       if [ "$model" != "$M_WRITE" ]; then
         echo "delegate: $model wrote nothing to $DIR (its write tool is confined to its artifact dir); retrying with $M_WRITE" >&2
         : > "$marker"
-        ( cd "$DIR" && "$AGY" -p "$p" "${mode[@]}" --add-dir "$DIR" --model "$M_WRITE" </dev/null ) || rc=$?
+        ( cd "$DIR" && with_timeout "$AGY" -p "$p" "${mode[@]}" --add-dir "$DIR" --model "$M_WRITE" </dev/null ) || rc=$?
         changed="$(find "$DIR" -newer "$marker" -not -path '*/.git/*' -print -quit 2>/dev/null)"
       fi
       [ -n "$changed" ] || { echo "delegate: --write changed nothing in $DIR even after retry. Use codex --write." >&2; return 1; }
@@ -217,7 +242,7 @@ codex) # delegate.sh codex "<prompt>" [dir] [--write]  -- the one that can run s
   out="$(mktemp "$TMP/out.XXXXXX")"
   [ -n "$WRITE" ] && wmark="$(mktemp "$TMP/cw.XXXXXX")"
   # Do not swallow stderr: when codex fails, its message is the only diagnostic there is.
-  if "$CODEX" exec --sandbox "$sb" -C "$DIR" --skip-git-repo-check -o "$out" "$p" </dev/null >/dev/null; then
+  if with_timeout "$CODEX" exec --sandbox "$sb" -C "$DIR" --skip-git-repo-check -o "$out" "$p" </dev/null >/dev/null; then
     cat "$out"
   else
     echo "delegate: codex exec failed (see above)" >&2; exit 1
@@ -247,7 +272,7 @@ review) # delegate.sh review [dir] [--uncommitted|--base <branch>] [--by claude|
   case "$by" in
   codex)
     [ -x "$CODEX" ] || die "codex not installed (try --by claude)"
-    ( cd "$rdir" && "$CODEX" review "${flags[@]}" </dev/null )
+    ( cd "$rdir" && with_timeout "$CODEX" review "${flags[@]}" </dev/null )
     ;;
   claude)
     [ -x "$AGY" ] || die "antigravity not installed, so no Claude reviewer is available"
@@ -304,7 +329,7 @@ image) # delegate.sh image "<prompt>" out.png [--paid]
   dest_dir="$(cd "$(dirname "$out")" && pwd)"; out="$dest_dir/$(basename "$out")"; b64=""
   if [ -x "$AGY" ]; then
     brain="$HOME/.gemini/antigravity-cli/brain"; marker="$(mktemp "$TMP/im.XXXXXX")"
-    ( cd "$dest_dir" && "$AGY" -p "Use your generate_image tool to create: $prompt" \
+    ( cd "$dest_dir" && with_timeout "$AGY" -p "Use your generate_image tool to create: $prompt" \
         --sandbox --add-dir "$dest_dir" --model "$M_CHEAP" </dev/null ) >/dev/null 2>&1 || true
     # The tool writes into its own artifact dir and names the path only in prose. Take the NEWEST
     # image it produced since the marker -- directory order is not creation order.
@@ -330,7 +355,7 @@ image) # delegate.sh image "<prompt>" out.png [--paid]
   # Second free path: codex's built-in image_gen tool needs no API key, so it rides the plan too.
   if [ -x "$CODEX" ]; then
     cmark="$(mktemp "$TMP/cm.XXXXXX")"
-    ( cd "$dest_dir" && "$CODEX" exec --sandbox workspace-write -C "$dest_dir" --skip-git-repo-check \
+    ( cd "$dest_dir" && with_timeout "$CODEX" exec --sandbox workspace-write -C "$dest_dir" --skip-git-repo-check \
         "/imagegen Generate: $prompt. Save the final image to $out" </dev/null ) >/dev/null 2>&1 || true
     if [ -f "$out" ] && [ "$out" -nt "$cmark" ] && file -b "$out" | grep -qiE 'image|bitmap'; then
       echo "wrote $out (codex imagegen, free)"; exit 0

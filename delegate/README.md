@@ -102,6 +102,11 @@ Two rules earned through failures, both enforced in code rather than documented 
   report "Done!" having touched nothing.
 - **Nothing spends money silently.** Two free image paths run before any paid one, and the paid path
   requires `--paid`.
+- **A stalled provider does not hang the caller forever.** Every external agy/codex/curl call is
+  bounded by `$DELEGATE_TIMEOUT` (default 240s), and the whole process group is killed on timeout,
+  not just the top process — so a hung CLI's own children die with it. Raise it for a task you know
+  is slow (`DELEGATE_TIMEOUT=600 delegate.sh hard ...`), or lower it in a script that would rather
+  fail fast and retry.
 
 ## Limitations
 

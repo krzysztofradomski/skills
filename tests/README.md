@@ -1,26 +1,30 @@
 # tests
 
-224 assertions across five suites. No test framework, no network, no provider
-calls, no money: [`lib.sh`](lib.sh) is forty lines of shell, and every provider
--- delegate itself, and the agy/codex/openrouter it talks to -- is faked.
+227 assertions across five default suites, plus one opt-in suite against a real
+provider. No test framework: [`lib.sh`](lib.sh) is under fifty lines of shell.
+The default suites use no network, no provider calls, no money -- every
+provider (delegate itself, and the agy/codex/openrouter it talks to) is faked.
 
 ```bash
-bash tests/run.sh                 # everything available
+bash tests/run.sh                 # everything available (fakes only, no quota spent)
 bash tests/run.sh svg gif         # a subset
 bash tests/run.sh --no-render     # skip the browser suite
+bash tests/run.sh real            # opt-in: against a real provider, spends plan allowance
 ```
 
 | Suite | Needs | Covers |
 |---|---|---|
-| [`test_delegate.sh`](test_delegate.sh) | `jq` | provider detection, tier routing, the write-verification guard and its retry, skill application, openrouter's free-model fallback, free-before-paid images |
+| [`test_delegate.sh`](test_delegate.sh) | `jq` | provider detection, tier routing, the write-verification guard and its retry, skill application, openrouter's free-model fallback, free-before-paid images, the timeout guard killing a hung provider (and its children) rather than hanging forever |
 | [`test_svg.sh`](test_svg.sh) | `python3` | extraction, the sanitizer, geometry, retiming, frame sequences, generation and the retry loop |
 | [`test_gif.sh`](test_gif.sh) | `python3` + Pillow | sizes, matte keying, delay quantization, looping, sheet slicing, generation |
 | [`test_install.sh`](test_install.sh) | a git clone | linking, subsets, idempotency, refusing to clobber |
 | [`test_render.py`](test_render.py) | Playwright + Chromium | whether the output actually moves, in a real browser |
+| [`test_real.sh`](test_real.sh) *(opt-in)* | a real agy/codex install | the same generation paths, but against the actual provider -- catches a real CLI/reply shape drifting from what the fakes assume, and confirms the timeout guard fires against genuine network latency, not just a sleeping stub |
 
 Missing dependencies **skip**, they do not fail: the shell suites run anywhere
 with `python3`, and the render suite bows out cleanly when Playwright or a
-Chromium is not installed.
+Chromium is not installed. `test_real.sh` skips the same way when no real
+provider is installed, rather than failing a machine that has none.
 
 ## How generation is tested without a provider
 

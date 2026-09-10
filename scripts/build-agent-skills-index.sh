@@ -47,7 +47,7 @@ for skill_dir in */; do
     type="archive"
     url="$domain/agent-skills/$name.tar.gz"
     archive="$out_dir/$name.tar.gz"
-    members="$(cd "$skill_dir" && find . -mindepth 1 -maxdepth 1 -printf '%P\n' | sort)"
+    members="$(cd "$skill_dir" && ls -A | sort)"
     tar -C "$skill_dir" \
       --sort=name --owner=0 --group=0 --numeric-owner --mtime='UTC 2020-01-01' \
       --exclude='__pycache__' --exclude='*.pyc' --exclude='*.pyo' --exclude='.DS_Store' \

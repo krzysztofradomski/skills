@@ -182,16 +182,20 @@ it explicitly (`/delegate`) when you want to be certain, or when the phrasing is
 bash tests/run.sh
 ```
 
-Five suites, 224 assertions, no test framework and no provider calls: delegate's
-own tests fake agy, codex and openrouter to check provider detection, tier
-routing, the write-verification guard, and the free-before-paid image order.
-Generation for the gif/svg skills is exercised against a fake `delegate.sh` that
-replays canned model replies and records the prompts it was handed, so the retry
-loop and the prompt contents are tested without spending quota. The browser suite
-(Playwright) checks that the SVG output actually animates, holds still under
-`prefers-reduced-motion`, and steps one frame per slot; it skips cleanly when
-Playwright is not installed. See [`tests/`](tests/) for what each suite covers
-and for the three real bugs they have already caught.
+Five default suites, 227 assertions, no test framework and no provider calls:
+delegate's own tests fake agy, codex and openrouter to check provider detection,
+tier routing, the write-verification guard, the free-before-paid image order,
+and the timeout guard that kills a hung provider (and its children) instead of
+hanging forever. Generation for the gif/svg skills is exercised against a fake
+`delegate.sh` that replays canned model replies and records the prompts it was
+handed, so the retry loop and the prompt contents are tested without spending
+quota. The browser suite (Playwright) checks that the SVG output actually
+animates, holds still under `prefers-reduced-motion`, and steps one frame per
+slot; it skips cleanly when Playwright is not installed. A sixth, opt-in suite
+(`bash tests/run.sh real`) runs the same generation paths against a real
+agy/codex provider to catch regressions the fakes can't, at the cost of real
+plan allowance. See [`tests/`](tests/) for what each suite covers and for the
+three real bugs they have already caught.
 
 ## Site
 
