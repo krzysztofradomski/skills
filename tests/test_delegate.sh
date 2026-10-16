@@ -169,19 +169,19 @@ expect_has "ai-studio    key present" "reports an ai-studio key once one is set"
 section "tier routing"
 run "$DELEGATE" code "do it" "$WORK"
 expect_ok "code routes through agy"
-[ "$(cat "$TMP/last_model")" = "claude-sonnet-4-6" ] \
+[ "$(cat "$TMP/last_model")" = "claude-sonnet-5-5-high" ] \
   && pass "at the default M_CODE model" || fail "at the default M_CODE model" "$(cat "$TMP/last_model")"
 run_sh "M_HARD=my-hard-model '$DELEGATE' hard 'do it' '$WORK'"
 [ "$(cat "$TMP/last_model")" = "my-hard-model" ] \
   && pass "M_HARD overrides the model hard routes to" || fail "M_HARD overrides the model hard routes to"
 run "$DELEGATE" read "do it" "$WORK"
-[ "$(cat "$TMP/last_model")" = "gemini-3.7-flash-high" ] \
+[ "$(cat "$TMP/last_model")" = "gemini-3.8-flash-high" ] \
   && pass "read routes to the read-tier model" || fail "read routes to the read-tier model"
 run "$DELEGATE" cheap "do it" "$WORK"
-[ "$(cat "$TMP/last_model")" = "gemini-3.7-flash-low" ] \
+[ "$(cat "$TMP/last_model")" = "gemini-3.8-flash-low" ] \
   && pass "cheap routes to the cheap-tier model" || fail "cheap routes to the cheap-tier model"
 run "$DELEGATE" antigravity "do it" "$WORK"
-[ "$(cat "$TMP/last_model")" = "claude-sonnet-4-6" ] \
+[ "$(cat "$TMP/last_model")" = "claude-sonnet-5-5-high" ] \
   && pass "bare antigravity defaults to the code-tier model" || fail "bare antigravity defaults to the code-tier model"
 run_sh "AGY_MODEL=custom-model '$DELEGATE' agy 'do it' '$WORK'"
 [ "$(cat "$TMP/last_model")" = "custom-model" ] \
@@ -204,13 +204,13 @@ section "the write guard and its retry"
 echo '*' > "$TMP/agy_writes_for"
 run "$DELEGATE" code "add a file" "$WORK" --write
 expect_ok "a model that actually writes succeeds first try"
-expect_file "$WORK/written-by-claude-sonnet-4-6.txt" "and the file lands in the workspace"
+expect_file "$WORK/written-by-claude-sonnet-5-5-high.txt" "and the file lands in the workspace"
 rm -f "$WORK"/written-by-*
-echo gemini-3.1-pro-high > "$TMP/agy_writes_for"
+echo gemini-4-argon-high > "$TMP/agy_writes_for"
 run "$DELEGATE" code "add a file" "$WORK" --write
 expect_ok "a model confined to its own artifact dir still succeeds"
-expect_has "retrying with gemini-3.1-pro-high" "because delegate notices nothing changed and retries on M_WRITE"
-expect_file "$WORK/written-by-gemini-3.1-pro-high.txt" "and the retry is the one that actually wrote"
+expect_has "retrying with gemini-4-argon-high" "because delegate notices nothing changed and retries on M_WRITE"
+expect_file "$WORK/written-by-gemini-4-argon-high.txt" "and the retry is the one that actually wrote"
 rm -f "$WORK"/written-by-*
 echo nobody-writes-this > "$TMP/agy_writes_for"
 run "$DELEGATE" code "add a file" "$WORK" --write

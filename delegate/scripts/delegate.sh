@@ -11,13 +11,13 @@ G_URL="https://generativelanguage.googleapis.com/v1beta/models"
 
 # Antigravity model tiers. 3rd-party (Claude) reason better about code; 1st-party (Gemini) is
 # faster and cheaper for reading/searching. Override any of them from the environment.
-M_HARD="${M_HARD:-claude-opus-4-6-thinking}"   # cross-cutting, subtle, hard to reverse
-M_CODE="${M_CODE:-claude-sonnet-4-6}"          # ordinary implementation
-M_READ="${M_READ:-gemini-3.7-flash-high}"      # read/search/summarize a tree
-M_CHEAP="${M_CHEAP:-gemini-3.7-flash-low}"     # trivial one-liners
-# Some models' write tool is hard-confined to their own artifact dir (claude-sonnet-4-6 fails this
+M_HARD="${M_HARD:-claude-opus-5-5-high}"        # cross-cutting, subtle, hard to reverse
+M_CODE="${M_CODE:-claude-sonnet-5-5-high}"      # ordinary implementation
+M_READ="${M_READ:-gemini-3.8-flash-high}"       # read/search/summarize a tree
+M_CHEAP="${M_CHEAP:-gemini-3.8-flash-low}"      # trivial one-liners
+# Some models' write tool is hard-confined to their own artifact dir (claude-sonnet fails this
 # way, intermittently, no matter how the prompt is worded). --write retries once on this model.
-M_WRITE="${M_WRITE:-gemini-3.1-pro-high}"
+M_WRITE="${M_WRITE:-gemini-4-argon-high}"
 
 die() { echo "delegate: $*" >&2; exit 2; }
 

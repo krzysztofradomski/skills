@@ -7,10 +7,10 @@ Details behind [SKILL.md](SKILL.md). Read when a provider misbehaves or a flag n
 Every rule below came from an observed failure, not a guess.
 
 **`--write` is verified.** Some models' write tool is hard-confined to their own artifact directory,
-so they report "Done!" having touched nothing in your workspace. `claude-sonnet-4-6` does this
+so they report "Done!" having touched nothing in your workspace. `claude-sonnet` does this
 intermittently regardless of prompt wording. Both Antigravity and Codex check that the workspace
 actually changed; the check uses directory mtime, so a deletion-only change counts. On Antigravity a
-failed write retries once with `$M_WRITE` (default `gemini-3.1-pro-high`, a model that writes
+failed write retries once with `$M_WRITE` (default `gemini-4-argon-high`, a model that writes
 reliably) and says so on stderr; if that also changes nothing the command fails, pointing at
 `codex --write`.
 
