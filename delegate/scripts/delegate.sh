@@ -366,14 +366,14 @@ image) # delegate.sh image "<prompt>" out.png [--paid]
   [ -n "$paid" ] || die "both free image paths failed. Paid providers need explicit --paid (OpenRouter spends real credit)."
   if [ -n "$GK" ]; then
     resp="$(jq -n --arg p "$prompt" '{contents:[{parts:[{text:$p}]}]}' \
-      | curl_key "x-goog-api-key: $GK" "$G_URL/gemini-2.5-flash-image:generateContent" \
+      | curl_key "x-goog-api-key: $GK" "$G_URL/gemini-3.8-flash-image:generateContent" \
           -H 'Content-Type: application/json' -d @-)"
     b64="$(printf '%s' "$resp" | jq -r '(.candidates[0].content.parts[]?|select(.inlineData).inlineData.data) // empty' | head -1)"
     [ -n "$b64" ] || echo "[delegate] AI Studio: $(printf '%s' "$resp" | jq -r '.error.message // "no image in response"' | head -1 | cut -c1-120) -- trying OpenRouter (paid)" >&2
   fi
   if [ -z "$b64" ]; then
     [ -n "$OR_KEY" ] || die "no image provider available"
-    b64="$(jq -n --arg m "google/gemini-2.5-flash-image" --arg p "$prompt" \
+    b64="$(jq -n --arg m "google/gemini-3.8-flash-image" --arg p "$prompt" \
         '{model:$m,messages:[{role:"user",content:$p}],modalities:["image","text"]}' \
       | curl_key "Authorization: Bearer $OR_KEY" "$OR_URL/chat/completions" \
           -H 'Content-Type: application/json' -d @- \
